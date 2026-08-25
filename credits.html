@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sviluppato da Matteo De Marco · jet netto</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Wix+Madefor+Display:wght@400;700;800&family=Wix+Madefor+Text:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=15">
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <a class="logo" href="index.html">jet<em>netto</em></a>
+    <div class="tag">RAL → netto 2026, voce per voce</div>
+  </header>
+
+  <section class="step is-visible" aria-label="Chi ha costruito il prototipo">
+    <h1>Sviluppato da <mark>Matteo De Marco</mark></h1>
+    <p class="lead">Prototipo per il task Product Builder di Jet HR. Il criterio del task era uno: dimostrare il controllo delle logiche. Il mio modo di rispondere: ogni numero in pagina ha una formula visibile, una fonte istituzionale e un test che lo verifica.</p>
+
+    <div class="city-card">
+      <div class="city-row">
+        <span class="city-label">Email</span>
+        <span class="city-value"><a href="mailto:matteodemarco272@gmail.com" style="color:inherit">matteodemarco272@gmail.com</a></span>
+      </div>
+      <div class="city-row">
+        <span class="city-label">In numeri</span>
+        <span class="city-value">53 test, 7.877 comuni con dati ufficiali, 11 fonti verificate</span>
+      </div>
+    </div>
+
+    <div class="notes" style="margin-top:26px">
+
+      <h3>Il metodo, in sei passi</h3>
+      <ul>
+        <li><b>1. Discovery del dominio</b> → prima del codice, le regole 2026 dalle fonti istituzionali: scaglioni IRPEF della Legge di Bilancio, circolare INPS n. 6/2026, art. 13 TUIR, taglio del cuneo (L. 207/2024), addizionali regionali e comunali, incentivi strutturali (L. 92/2012).</li>
+        <li><b>2. Discovery Jet HR</b> → studio del prodotto (il simulatore costi è una funzione core) e del brand: colori e font di queste pagine sono i token reali estratti dal CSS di produzione di jethr.com (nero caldo, lime, famiglia Wix Madefor).</li>
+        <li><b>3. Scouting UI/UX</b> → best practice dei wizard: una domanda per schermata, avanzamento visibile e navigabile all'indietro, ricerca con suggerimenti, tastiera e screen reader, mobile first, e una grammatica dei colori unica (nero = selezionato, lime = azione).</li>
+        <li><b>4. Scomposizione degli input</b> → tre passi: chi sei (il copy si adatta: al dipendente il sito dà del tu, all'HR parla del candidato), dove, quanto. Tutto il resto è calcolato, non chiesto.</li>
+        <li><b>5. Motore separato e testato</b> → la fiscalità vive in una funzione pura senza dipendenze, verificata da 53 assert eseguibili in Node: formule di legge, un caso completo ricalcolato a mano, monotonia del netto, ripartizione delle mensilità, costo azienda e incentivi.</li>
+        <li><b>6. Audit</b> → 8.000 combinazioni regione × RAL senza anomalie, contrasti WCAG calcolati (non stimati), e ogni link di fonte chiamato via HTTP per verificare che porti al documento giusto.</li>
+      </ul>
+
+      <h3>Cosa c'è dentro</h3>
+      <ul>
+        <li><b>Due viste, un motore</b> → dipendente (netto, cascata delle trattenute, calendario delle mensilità con la tredicesima "più leggera" spiegata) e azienda (costo totale, contributo addizionale del tempo determinato, simulatore degli incentivi strutturali).</li>
+        <li><b>Dati veri, non tipici</b> → 20 regioni dalla mappa interattiva; 7.877 comuni con aliquota, soglia di esenzione e scaglioni importati dall'elenco annuale ufficiale dell'Agenzia delle Entrate, uniti all'elenco ISTAT per codice catastale; 1.095 comuni calcolati per scaglioni veri; 33 comuni recenti con fallback dichiarato in interfaccia.</li>
+        <li><b>Le logiche nel prodotto</b> → ogni voce del risultato si apre sulla propria spiegazione: prima le parole, poi la formula coi numeri dell'utente, poi gli scaglioni. E ogni termine tecnico (addizionale, esenzione, TFR) ha la spiegazione al passaggio.</li>
+        <li><b>Report stampabili</b> → un PDF per il dipendente e uno per l'azienda, generati dal browser senza che alcun dato lasci la pagina. Deep link per condividere una simulazione con un URL.</li>
+      </ul>
+
+      <h3>La catena dell'affidabilità</h3>
+      <p>Come un numero arriva in pagina: <b>fonte istituzionale → dato nel motore → test che lo blinda → dichiarazione dove semplifica</b>. E la catena è stata messa alla prova davvero: l'audit ha trovato e corretto una soglia di esenzione sbagliata (Roma: 14.000 €, non 12.000), due bug del parser dell'elenco AdE (Genova perdeva un'aliquota, un testo descrittivo inquinava Terlizzi) e due link di fonte che non rispondevano più. La fiducia in questo prototipo non è dichiarata: è testata, e gli errori trovati sono documentati invece che nascosti.</p>
+
+      <h3>Fonti</h3>
+      <ol class="fonti">
+        <li><a href="https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:2025;199" target="_blank" rel="noopener">Legge di Bilancio 2026 (L. 199/2025), Normattiva</a></li>
+        <li><a href="https://www.agenziaentrate.gov.it/portale/web/guest/aliquote-e-calcolo-dell-irpef" target="_blank" rel="noopener">Agenzia delle Entrate, aliquote e calcolo IRPEF</a></li>
+        <li><a href="https://www.inps.it/it/it/inps-comunica/atti/circolari-messaggi-e-normativa.html" target="_blank" rel="noopener">INPS, circolare n. 6 del 30/01/2026</a></li>
+        <li><a href="https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:decreto.del.presidente.della.repubblica:1986-12-22;917~art13" target="_blank" rel="noopener">Art. 13 TUIR (DPR 917/1986), Normattiva</a></li>
+        <li><a href="https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:2024-12-30;207~art1" target="_blank" rel="noopener">L. 207/2024, art. 1, Normattiva</a></li>
+        <li><a href="https://www.finanze.gov.it/it/fiscalita/fiscalita-regionale-e-locale/Addizionale-regionale-allIRPEF/" target="_blank" rel="noopener">MEF, Dipartimento delle Finanze, addizionale regionale IRPEF</a></li>
+        <li><a href="https://www1.finanze.gov.it/finanze2/dipartimentopolitichefiscali/fiscalitalocale/nuova_addcomirpef/sceltaregione.htm" target="_blank" rel="noopener">MEF, ricerca addizionale comunale per comune</a></li>
+        <li><a href="https://www.comune.milano.it/argomenti/tributi/addizionale-comunale-irpef" target="_blank" rel="noopener">Comune di Milano, addizionale comunale IRPEF</a></li>
+        <li><a href="https://www.comune.roma.it/web/it/scheda-servizi.page?contentId=INF41403" target="_blank" rel="noopener">Roma Capitale, addizionale IRPEF</a></li>
+        <li><a href="https://www.agenziaentrate.gov.it/portale/documents/d/guest/elenco-annuale-addizionale-comunale-modulistica-2026_def" target="_blank" rel="noopener">Agenzia delle Entrate, elenco annuale delle addizionali comunali (2026)</a></li>
+        <li><a href="https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:2012-06-28;92~art4" target="_blank" rel="noopener">L. 92/2012 (riforma Fornero), Normattiva</a></li>
+      </ol>
+
+      <h3>Nota finale</h3>
+      <p>Il task chiedeva un prototipo di cui avere il controllo delle logiche. Questo è il mio modo di intenderlo: ogni numero ha una formula visibile, una fonte ufficiale e un test che lo verifica. Il resto lo discutiamo volentieri a voce.</p>
+    </div>
+
+    <div class="stepnav">
+      <a class="btn btn-primary" href="index.html" style="text-decoration:none">Torna al calcolatore</a>
+    </div>
+  </section>
+
+  <footer class="colophon">
+    <span>Prototipo per il task Product Builder di Jet HR. Non è consulenza fiscale.</span>
+  </footer>
+
+</div>
+</body>
+</html>

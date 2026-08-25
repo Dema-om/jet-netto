@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dalla RAL al netto · prototipo per Jet HR</title>
+  <meta name="description" content="Calcolatore RAL → netto 2026: contributi INPS, IRPEF a scaglioni, addizionali e taglio del cuneo, spiegati voce per voce.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Wix+Madefor+Display:wght@400;700;800&family=Wix+Madefor+Text:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=15">
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <a class="logo" href="index.html">jet<em>netto</em></a>
+    <div class="tag">RAL → netto 2026, voce per voce</div>
+  </header>
+
+  <nav class="progress" aria-label="Avanzamento">
+    <div class="p-step"><span class="p-dot">1</span> Regione</div>
+    <div class="p-line" aria-hidden="true"></div>
+    <div class="p-step"><span class="p-dot">2</span> Comune</div>
+    <div class="p-line" aria-hidden="true"></div>
+    <div class="p-step"><span class="p-dot">3</span> RAL</div>
+    <div class="p-line" aria-hidden="true"></div>
+    <div class="p-step"><span class="p-dot">✓</span> Netto</div>
+  </nav>
+
+  <!-- STEP 1 · Regione -->
+  <section class="step" data-step="1" aria-label="Passo 1: regione di residenza">
+    <div class="view-switch">
+      <div class="seg" role="group" aria-label="Chi sei">
+        <button id="aud-dip" aria-pressed="true">Sono un dipendente</button>
+        <button id="aud-hr" aria-pressed="false">Sono un'azienda (HR)</button>
+      </div>
+    </div>
+    <h1 id="s1-title">Dove sei <mark>residente</mark>?</h1>
+    <p class="lead" id="s1-lead">La residenza fiscale decide quanto paghi di addizionale regionale e comunale. Tocca la tua regione sulla mappa, o scegli dall'elenco.</p>
+    <div class="geo">
+      <div class="map-card" id="map-slot"></div>
+      <div class="geo-side">
+        <div class="geo-hint" id="geo-hint">Passa sulla mappa per vedere l'aliquota di ogni regione.</div>
+        <button class="linklike geo-alt" id="region-alt-toggle" aria-expanded="false" aria-controls="region-alt">Preferisco scegliere da un elenco</button>
+        <div class="region-alt" id="region-alt" hidden>
+          <label for="region-select">Regione di residenza</label>
+          <select id="region-select">
+            <option value="" disabled selected>Seleziona la regione</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="stepnav">
+      <button class="btn btn-primary" id="step1-next" disabled>Avanti</button>
+      <span class="keyhint">Invio per continuare</span>
+    </div>
+  </section>
+
+  <!-- STEP 2 · Comune -->
+  <section class="step" data-step="2" aria-label="Passo 2: comune">
+    <h1 id="s2-title">Il tuo <mark>comune</mark></h1>
+    <p class="lead" id="s2-lead">Ogni comune delibera la propria addizionale. Cerca il tuo: l'elenco mostra solo i comuni della regione che hai scelto.</p>
+    <div class="city-card">
+      <div class="field city-search">
+        <label for="city-input">Comune di residenza</label>
+        <div class="ac-wrap">
+          <input id="city-input" type="text" autocomplete="off" spellcheck="false" placeholder="Inizia a scrivere…" role="combobox" aria-expanded="false" aria-controls="ac-list" aria-describedby="city-search-hint">
+          <ul class="ac-list" id="ac-list" role="listbox" hidden></ul>
+        </div>
+        <p class="field-hint" id="city-search-hint"></p>
+      </div>
+      <div class="city-row">
+        <span class="city-label">Aliquota comunale</span>
+        <span class="city-value" id="city-aliquota">—</span>
+      </div>
+      <div class="city-row">
+        <span class="city-label"><span class="tip" tabindex="0" data-tip="Alcuni comuni non la fanno pagare ai redditi bassi. La soglia per legge è sull'imponibile (il lordo meno i contributi): qui te la traduciamo in RAL, il numero che conosci.">Chi non la paga</span></span>
+        <span class="city-value" id="city-esenzione">—</span>
+      </div>
+      <p class="field-hint" id="city-source"></p>
+    </div>
+    <div class="stepnav">
+      <button class="btn btn-ghost" id="step2-back">Indietro</button>
+      <button class="btn btn-primary" id="step2-next">Avanti</button>
+      <span class="keyhint">Invio per continuare</span>
+    </div>
+  </section>
+
+  <!-- STEP 3 · RAL -->
+  <section class="step" data-step="3" aria-label="Passo 3: retribuzione annua lorda">
+    <h1 id="s3-title">La tua <mark>RAL</mark></h1>
+    <p class="lead" id="s3-lead">La retribuzione annua lorda che trovi nel contratto o nella lettera di offerta, tredicesima inclusa.</p>
+    <div class="ral-field">
+      <label for="ral-input" class="m-label" style="display:block;margin-bottom:8px;font-weight:600;font-size:0.85rem;color:var(--ink-soft)">Retribuzione annua lorda</label>
+      <div class="ral-input-wrap">
+        <span class="euro" aria-hidden="true">€</span>
+        <input id="ral-input" type="text" inputmode="numeric" autocomplete="off" placeholder="30.000" aria-describedby="ral-error">
+      </div>
+      <p class="ral-error" id="ral-error" role="alert"></p>
+      <div class="chips" aria-label="Esempi rapidi">
+        <button class="chip" data-ral="25000">25.000 €</button>
+        <button class="chip" data-ral="30000">30.000 €</button>
+        <button class="chip" data-ral="40000">40.000 €</button>
+        <button class="chip" data-ral="60000">60.000 €</button>
+      </div>
+      <div class="mensilita">
+        <p class="m-label" id="mensilita-label">Su quante mensilità?</p>
+        <div class="seg" role="group" aria-labelledby="mensilita-label">
+          <button data-m="12" aria-pressed="false">12</button>
+          <button data-m="13" aria-pressed="true">13</button>
+          <button data-m="14" aria-pressed="false">14</button>
+        </div>
+        <p class="field-hint">La maggior parte dei CCNL impiegatizi prevede 13 mensilità: la tredicesima arriva a dicembre. La quattordicesima, dove il CCNL la prevede, tra giugno e luglio.</p>
+      </div>
+      <div class="hr-contract" id="hr-contract" hidden>
+        <p class="m-label" id="hr-contract-label" style="font-weight:600;font-size:0.85rem;margin:0 0 8px">Che contratto offri?</p>
+        <div class="seg" role="group" aria-labelledby="hr-contract-label">
+          <button data-c="ind" aria-pressed="true">Indeterminato</button>
+          <button data-c="det" aria-pressed="false">Determinato</button>
+        </div>
+        <p class="field-hint" id="hr-contract-hint">Il determinato costa l'1,4% di contributi in più (finanzia la NASpI) e dimezza la durata degli incentivi.</p>
+      </div>
+
+    </div>
+    <div class="stepnav">
+      <button class="btn btn-ghost" id="step3-back">Indietro</button>
+      <button class="btn btn-primary" id="calc-btn" disabled>Calcola il netto</button>
+      <span class="keyhint">Invio per calcolare</span>
+    </div>
+  </section>
+
+  <!-- STEP 4 · Risultato -->
+  <section class="step" data-step="4" aria-label="Risultato">
+    <h1 id="result-title">Ecco cosa ti <mark>resta</mark></h1>
+
+    <div class="view-switch">
+      <div class="seg" role="group" aria-label="Punto di vista">
+        <button id="vs-dip" aria-pressed="true">Per il dipendente</button>
+        <button id="vs-hr" aria-pressed="false">Per l'azienda (HR)</button>
+      </div>
+    </div>
+
+    <div id="view-dip">
+    <div class="result-hero">
+      <div>
+        <div class="rh-label">In busta ogni mese</div>
+        <div class="rh-main" id="rh-mensile">—</div>
+        <div class="rh-extra" id="rh-extra"></div>
+      </div>
+      <div class="rh-side">
+        <div id="rh-annuo">—<span>netto annuo</span></div>
+      </div>
+    </div>
+
+    <div class="result-meta" id="meta-pills"></div>
+
+    <div class="breakdown">
+      <div class="bd-head">
+        <h2>Le tasse e i contributi che paghi</h2>
+        <span class="bd-total" id="bd-total">—</span>
+      </div>
+      <details class="bd-details" id="bd-details">
+        <summary>le voci singole spiegate con le formule</summary>
+        <div id="breakdown-rows"></div>
+      </details>
+    </div>
+
+    <div class="result-actions">
+      <button class="btn btn-lime" id="report-btn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Scarica il report (PDF)
+      </button>
+      <button class="btn btn-ghost" id="result-back">Prova un'altra RAL</button>
+      <button class="linklike" id="result-restart">Ricomincia da capo</button>
+    </div>
+
+    <div class="breakdown calendar" id="calendar-card"></div>
+
+    </div><!-- /view-dip -->
+
+    <!-- Vista azienda (HR) -->
+    <div id="view-hr" hidden>
+      <div class="result-hero">
+        <div>
+          <div class="rh-label">Costo azienda annuo</div>
+          <div class="rh-main" id="hr-totale">—</div>
+          <div class="rh-extra" id="hr-mensile"></div>
+        </div>
+        <div class="rh-side">
+          <div id="hr-netto">—<span>di cui in tasca al dipendente</span></div>
+        </div>
+      </div>
+
+      <div class="breakdown">
+        <div class="bd-head">
+          <h2>Cosa paga l'azienda oltre la RAL</h2>
+          <span class="bd-total" id="hr-extra-total">—</span>
+        </div>
+        <div id="hr-rows"></div>
+      </div>
+
+      <div class="result-actions">
+        <button class="btn btn-lime" id="report-btn-hr">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Scarica il report azienda (PDF)
+        </button>
+      </div>
+
+      <div class="breakdown sgravi">
+        <h2>Chi assumi? Alcuni profili costano meno</h2>
+        <div class="sgravi-body">
+          <p class="field-hint" style="margin-top:0">Lo Stato riduce i contributi a chi assume da alcune categorie. Qui i soli incentivi strutturali (L. 92/2012), quelli sempre in vigore: tocca un profilo e vedi il risparmio. I bonus temporanei a fondi limitati (es. under 35) vanno verificati caso per caso.</p>
+          <div class="sgravi-cards" role="group" aria-label="Profilo del candidato">
+            <button class="sgravio-pick" data-sgravio="" aria-pressed="true"><b>Assunzione standard</b><span>nessun incentivo</span></button>
+            <button class="sgravio-pick" data-sgravio="over50" aria-pressed="false"><b>Over 50</b><span>disoccupato da almeno 12 mesi</span></button>
+            <button class="sgravio-pick" data-sgravio="donna" aria-pressed="false"><b>Donna "svantaggiata"</b><span>senza impiego da 24 mesi, o 6 in aree e settori svantaggiati</span></button>
+            <button class="sgravio-pick" data-sgravio="naspi" aria-pressed="false"><b>Percettore NASpI</b><span>sta ricevendo l'indennità di disoccupazione</span></button>
+          </div>
+          <div class="city-edit" id="naspi-fields" style="margin-top:12px">
+            <p class="field-hint" style="grid-column:1/-1;margin:0">Chi è in NASpI porta con sé un incentivo: lo Stato gira all'azienda il 20% dell'indennità di disoccupazione che la persona avrebbe ancora ricevuto. Servono due numeri della sua situazione: quanto prende al mese e per quanti mesi ancora.</p>
+            <div class="field">
+              <label for="naspi-indennita">Indennità NASpI mensile (€)</label>
+              <input id="naspi-indennita" type="number" min="0" step="50" value="1000">
+            </div>
+            <div class="field">
+              <label for="naspi-mesi">Mesi residui</label>
+              <input id="naspi-mesi" type="number" min="1" max="24" step="1" value="12">
+            </div>
+          </div>
+          <div id="sgravio-result"></div>
+        </div>
+      </div>
+    </div><!-- /view-hr -->
+
+
+    <div class="notes">
+      <details class="notes-acc">
+      <summary>Le logiche del calcolo, in sette passaggi</summary>
+      <ul>
+        <li><b>1. RAL</b> → si parte dal lordo annuo del contratto, tredicesima inclusa.</li>
+        <li><b>2. Contributi INPS</b> → il 9,19% della RAL va alla previdenza (più 1% sulla parte oltre 56.224 €). Si calcolano sulla RAL, non sul netto.</li>
+        <li><b>3. Imponibile fiscale</b> → l'IRPEF non si paga sulla RAL: si paga su RAL meno contributi. È il concetto più frainteso di tutta la busta paga.</li>
+        <li><b>4. IRPEF a scaglioni</b> → il reddito si tassa "a fette": 23% fino a 28.000, 33% fino a 50.000, 43% oltre. Salire di scaglione non riduce mai il netto.</li>
+        <li><b>5. Detrazioni</b> → si sottraggono dall'imposta, non dal reddito. La detrazione da lavoro dipendente decresce col reddito e sparisce a 50.000 €.</li>
+        <li><b>6. Addizionali</b> → regione e comune tassano lo stesso imponibile del punto 3, ognuno con le proprie aliquote.</li>
+        <li><b>7. Taglio del cuneo</b> → sotto i 20.000 € arriva una somma esente che si aggiunge al netto; tra 20.000 e 40.000 una detrazione extra fino a 1.000 €.</li>
+      </ul>
+      </details>
+      <details class="notes-acc">
+      <summary>Semplificazioni dichiarate (e perché restano tali)</summary>
+      <p>Ogni scorciatoia del calcolo è elencata qui col motivo per cui non è sviluppata: alcune sono assunzioni del caso standard, altre non cambierebbero i numeri, altre ancora dipendono da dati che non esistono in forma aperta.</p>
+      <ul>
+        <li><b>Nessun carico familiare né agevolazione</b> → è l'assunzione dichiarata del caso standard: le detrazioni per familiari si innesterebbero nello stesso punto della catena delle altre detrazioni, ma richiederebbero domande in più (coniuge, figli, età) per una platea che l'Assegno Unico ha molto ridotto.</li>
+        <li><b>Part time senza campo dedicato</b> → svilupparlo non cambierebbe nulla: il calcolo è lineare nella RAL, chi è part time inserisce la sua RAL effettiva e ottiene il risultato corretto.</li>
+        <li><b>Addizionali per competenza</b> → in busta reale arrivano l'anno dopo con saldo e acconto: modellare il meccanismo raddoppierebbe la complessità senza cambiare il totale che paghi.</li>
+        <li><b>Regioni con aliquota base (tranne la Lombardia)</b> → alcune regioni hanno scaglioni propri, ma non li pubblicano in formato strutturato: il motore li supporta già (la Lombardia li usa), mancano i dati aperti, non il codice.</li>
+        <li><b>TFR fuori dal netto</b> → è retribuzione differita: non passa dalla busta, quindi mostrarlo nel netto sarebbe un errore. Lo mostriamo come maturazione annua.</li>
+        <li><b>Trattamento integrativo semplificato</b> → la verifica di capienza completa considera anche altre detrazioni (familiari, mutuo) che il wizard non chiede: con il caso standard il risultato coincide.</li>
+        <li><b>Vista azienda con stime</b> → l'INAIL esatto dipende dal codice tariffa della mansione e i fondi di categoria dal CCNL: dati non disponibili in forma aperta, usiamo i valori tipici da ufficio dichiarandoli.</li>
+        <li><b>Incentivi solo strutturali</b> → i bonus temporanei (es. under 35) dipendono da decreti attuativi e fondi a esaurimento: una stima che può scadere da un giorno all'altro vale meno di nessuna stima.</li>
+      </ul>
+      </details>
+      <details class="notes-acc" id="fonti-acc">
+      <summary>Fonti: solo siti istituzionali</summary>
+      <p>Ogni numero del calcolo rimanda alla sua fonte.</p>
+      <ol class="fonti">
+        <li id="fonte-1"><a href="https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:2025;199" target="_blank" rel="noopener">Legge di Bilancio 2026 (L. 199/2025), Normattiva</a>: scaglioni e aliquote IRPEF.</li>
+        <li id="fonte-2"><a href="https://www.agenziaentrate.gov.it/portale/web/guest/aliquote-e-calcolo-dell-irpef" target="_blank" rel="noopener">Agenzia delle Entrate, aliquote e calcolo IRPEF</a>: pagina ufficiale aggiornata.</li>
+        <li id="fonte-3"><a href="https://www.inps.it/it/it/inps-comunica/atti/circolari-messaggi-e-normativa.html" target="_blank" rel="noopener">INPS, circolare n. 6 del 30/01/2026</a>: aliquote contributive e prima fascia di retribuzione pensionabile.</li>
+        <li id="fonte-4"><a href="https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:decreto.del.presidente.della.repubblica:1986-12-22;917~art13" target="_blank" rel="noopener">Art. 13 TUIR (DPR 917/1986), Normattiva</a>: detrazioni per redditi da lavoro dipendente.</li>
+        <li id="fonte-5"><a href="https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:2024-12-30;207~art1" target="_blank" rel="noopener">L. 207/2024, art. 1 (commi 4-9), Normattiva</a>: somma esente, ulteriore detrazione e trattamento integrativo.</li>
+        <li id="fonte-6"><a href="https://www.finanze.gov.it/it/fiscalita/fiscalita-regionale-e-locale/Addizionale-regionale-allIRPEF/" target="_blank" rel="noopener">MEF, Dipartimento delle Finanze, addizionale regionale IRPEF</a>: aliquote e delibere per ogni regione (per la Lombardia, scaglioni confermati anche su regione.lombardia.it).</li>
+        <li id="fonte-7"><a href="https://www1.finanze.gov.it/finanze2/dipartimentopolitichefiscali/fiscalitalocale/nuova_addcomirpef/sceltaregione.htm" target="_blank" rel="noopener">MEF, Dipartimento delle Finanze, fiscalità locale</a>: aliquote e delibere di addizionale comunale per ogni comune.</li>
+        <li id="fonte-8"><a href="https://www.comune.milano.it/argomenti/tributi/addizionale-comunale-irpef" target="_blank" rel="noopener">Comune di Milano, addizionale comunale IRPEF</a>: aliquota 0,80% e soglia di esenzione 23.000 €.</li>
+        <li id="fonte-9"><a href="https://www.comune.roma.it/web/it/scheda-servizi.page?contentId=INF41403" target="_blank" rel="noopener">Roma Capitale, addizionale IRPEF</a>: aliquota 0,90%, esenzione 14.000 € dal 2025.</li>
+        <li id="fonte-10"><a href="https://www.agenziaentrate.gov.it/portale/documents/d/guest/elenco-annuale-addizionale-comunale-modulistica-2026_def" target="_blank" rel="noopener">Agenzia delle Entrate, elenco annuale delle aliquote di addizionale comunale (modulistica 2026)</a>: aliquote, scaglioni e soglie di esenzione di ogni comune, riferite al saldo 2025 e all'acconto 2026. È la fonte dei dati comunali del calcolatore; i casi particolari agevolativi (colonna Tipizzazione) non sono modellati.</li>
+        <li id="fonte-11"><a href="https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:2012-06-28;92~art4" target="_blank" rel="noopener">L. 92/2012 (riforma Fornero), Normattiva</a>: incentivi strutturali all'assunzione: art. 4 commi 8-11 (over 50 e donne svantaggiate, 50% dei contributi datoriali), art. 2 comma 10-bis (percettori NASpI, 20% dell'indennità residua).</li>
+      </ol>
+      </details>
+    </div>
+
+  </section>
+
+  <!-- Report stampabile: visibile solo in stampa, riempito al calcolo -->
+  <section id="report" class="report-sheet" aria-hidden="true"></section>
+
+  <footer class="colophon">
+    <span>Prototipo realizzato per il task Product Builder di Jet HR. Valori indicativi per un caso standard: non è consulenza fiscale né una busta paga.</span>
+    <a class="credit" href="credits.html">Sviluppato da Matteo De Marco</a>
+  </footer>
+
+</div>
+<script src="italy-map.js?v=2"></script>
+<script src="comuni.js?v=2"></script>
+<script src="engine.js?v=2"></script>
+<script src="app.js?v=16"></script>
+</body>
+</html>
