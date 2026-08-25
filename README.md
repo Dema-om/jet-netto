@@ -14,7 +14,7 @@ controllo delle logiche. Il prototipo lo prende alla lettera su tre piani:
 
 1. **Il motore è separato dalla UI.** Tutta la fiscalità sta in `engine.js`,
    una funzione pura senza dipendenze che gira identica nel browser e in Node.
-   Si testa da terminale: `node engine.test.js` (50 assert su formule, casi
+   Si testa da terminale: `node engine.test.js` (53 assert su formule, casi
    completi verificati a mano, monotonia del netto, ripartizione delle
    mensilità, dati dei comuni, costo azienda, incentivi e robustezza input). L'audit finale ha
    passato al setaccio 8.000 combinazioni regione × RAL senza anomalie e
@@ -81,8 +81,9 @@ Stessi tre input, due soggetti diversi:
 - **Per il dipendente** (default): netto mensile e annuo, cascata delle
   trattenute, calendario delle mensilità.
 - **Per l'azienda (HR)**: costo azienda voce per voce (RAL + INPS datore
-  23,81% + TFR 6,91% + INAIL ~0,4%), cuneo complessivo ("di ogni 100 € spesi,
-  al dipendente ne arrivano X") e il simulatore degli incentivi all'assunzione.
+  23,81% + TFR 6,91% + INAIL ~0,4%), scelta del contratto (il tempo
+  determinato aggiunge il contributo addizionale dell'1,4% e riduce la durata
+  degli incentivi a 12 mesi) e il simulatore degli incentivi all'assunzione.
 
 Il simulatore copre di proposito solo gli incentivi STRUTTURALI della
 L. 92/2012, quelli sempre in vigore e senza fondi a esaurimento: over 50
