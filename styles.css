@@ -486,6 +486,15 @@ details.b-details th { color: var(--ink-muted); font-weight: 600; }
 .notes details.notes-acc > ul, .notes details.notes-acc > ol, .notes details.notes-acc > p { margin-top: 0; }
 
 .fonti li.fonte-flash { animation: fonte-flash 2s ease; border-radius: 6px; }
+.fonte-flash { animation: fonte-flash 2s ease; }
+.fn-back {
+  background: none; border: none; font: inherit; cursor: pointer;
+  color: var(--green-deep); font-size: 0.85rem; font-weight: 600;
+  text-decoration: underline; text-underline-offset: 3px;
+  margin-left: 8px; padding: 12px 8px; margin-top: -12px; margin-bottom: -12px; /* bersaglio 44px senza spostare il testo */
+}
+.fn-back:hover { color: var(--ink); }
+.fn-back:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; border-radius: 4px; }
 @keyframes fonte-flash {
   0%, 55% { background: var(--lime-soft); box-shadow: 0 0 0 6px var(--lime-soft); }
   100% { background: transparent; box-shadow: none; }

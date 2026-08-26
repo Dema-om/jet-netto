@@ -399,6 +399,22 @@
     void target.offsetWidth;
     target.classList.add('fonte-flash');
     setTimeout(() => target.classList.remove('fonte-flash'), 2000);
+    // Backlink alla Wikipedia: un solo tastino alla volta, resta finché non lo usi
+    document.querySelectorAll('.fn-back').forEach((b) => b.remove());
+    const origine = a.closest('.v-row') || a.closest('summary') || a.parentElement;
+    const back = document.createElement('button');
+    back.className = 'fn-back';
+    back.textContent = '↩ torna dov\'eri';
+    back.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      let d = origine.closest('details');
+      while (d) { d.open = true; d = d.parentElement && d.parentElement.closest('details'); }
+      origine.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      origine.classList.add('fonte-flash');
+      setTimeout(() => origine.classList.remove('fonte-flash'), 2000);
+      back.remove();
+    });
+    target.appendChild(back);
   });
 
   function renderResult(r) {
@@ -408,7 +424,7 @@
       d.extraCount === 1
         ? `più la tredicesima a dicembre: ${fmtEur(d.extra)}`
         : `più tredicesima e quattordicesima: ${fmtEur(d.extra)} l'una`;
-    $('#rh-annuo').innerHTML = `${fmtEur(r.nettoAnnuo)}<span>netto annuo</span>`;
+    $('#rh-annuo').innerHTML = `<span>netto annuo</span>${fmtEur(r.nettoAnnuo)}`;
     $('#bd-total').innerHTML = `− ${fmtEur(r.totaleTrattenute, 2)}`;
     $('#bd-details').open = false;
 
@@ -630,7 +646,7 @@
       : "Il tempo determinato costerebbe l'1,4% in più di contributi (finanzia la NASpI) e dimezzerebbe la durata degli incentivi: 12 mesi invece di 18.";
     $('#hr-totale').innerHTML = `${fmtEur(c.totale)}<small> /anno</small>`;
     $('#hr-mensile').textContent = `circa ${fmtEur(c.totale / 12)} al mese, tutto compreso`;
-    $('#hr-netto').innerHTML = `${fmtEur(r.nettoAnnuo)}<span>di cui in tasca al dipendente</span>`;
+    $('#hr-netto').innerHTML = `<span>di cui in tasca al dipendente</span>${fmtEur(r.nettoAnnuo)}`;
     $('#hr-extra-total').innerHTML = `+ ${fmtEur(c.totale - c.ral, 2)}`;
 
     const pct = (v) => (c.totale > 0 ? (v / c.totale) * 100 : 0);
