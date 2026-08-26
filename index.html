@@ -266,7 +266,7 @@
         <li><b>Nessun carico familiare né agevolazione</b> → è l'assunzione dichiarata del caso standard: le detrazioni per familiari si innesterebbero nello stesso punto della catena delle altre detrazioni, ma richiederebbero domande in più (coniuge, figli, età) per una platea che l'Assegno Unico ha molto ridotto.</li>
         <li><b>Part time senza campo dedicato</b> → svilupparlo non cambierebbe nulla: il calcolo è lineare nella RAL, chi è part time inserisce la sua RAL effettiva e ottiene il risultato corretto.</li>
         <li><b>Addizionali per competenza</b> → in busta reale arrivano l'anno dopo con saldo e acconto: modellare il meccanismo raddoppierebbe la complessità senza cambiare il totale che paghi.</li>
-        <li><b>Regioni a scaglioni dove serve</b> → Lombardia, Friuli-Venezia Giulia e Lazio usano gli scaglioni progressivi reali 2026; le altre l'aliquota base pubblicata. Le regole speciali di Trento/Bolzano (deduzioni) non sono modellate: dato non verificato in modo univoco.</li>
+        <li><b>Addizionali regionali: le 20 strutture vere</b> → ogni regione segue la sua pagina MEF 2026: scaglioni progressivi dove ci sono, fasce sull'intero imponibile (Friuli-VG, Valle d'Aosta con esenzione fino a 15.000), aliquote ridotte sotto soglia con detrazioni di fascia (Lazio −60 €, Umbria −150 €). Non modellate: le agevolazioni familiari regionali e le misure provinciali di Trento (deduzione 30.000) e Bolzano (detrazione 430,50), perché la mappa non distingue le due province.</li>
         <li><b>TFR fuori dal netto</b> → è retribuzione differita: non passa dalla busta, quindi mostrarlo nel netto sarebbe un errore. Lo mostriamo come maturazione annua.</li>
         <li><b>Trattamento integrativo semplificato</b> → la verifica di capienza completa considera anche altre detrazioni (familiari, mutuo) che il wizard non chiede: con il caso standard il risultato coincide.</li>
         <li><b>Vista azienda con stime</b> → l'INAIL esatto dipende dal codice tariffa della mansione e i fondi di categoria dal CCNL: dati non disponibili in forma aperta, usiamo i valori tipici da ufficio dichiarandoli.</li>
@@ -321,6 +321,6 @@
 <script src="italy-map.js?v=2"></script>
 <script src="comuni.js?v=2"></script>
 <script src="engine.js?v=3"></script>
-<script src="app.js?v=22"></script>
+<script src="app.js?v=23"></script>
 </body>
 </html>

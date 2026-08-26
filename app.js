@@ -515,9 +515,16 @@
       amount: r.addizionali.regionale, sign: '-', bar: pct(r.addizionali.regionale),
       body:
         `${r.input.regione} tassa lo stesso imponibile dell'IRPEF (${fmtEur(R, 2)}), non la RAL.` +
-        (r.addizionali.dettaglioRegionale
-          ? ` Usa scaglioni propri:` + scaglioniTable(r.addizionali.dettaglioRegionale)
-          : `<br>${fmtEur(R, 2)} × ${fmtPct(TAX_2026.regioni[state.regioneId].aliquota)} = <b>${fmtEur(r.addizionali.regionale, 2)}</b>`) +
+        (r.addizionali.regionale === 0
+          ? ` Qui non è dovuta: ${r.addizionali.regolaRegionale === 'esente sotto soglia' ? 'la regione esenta gli imponibili sotto la sua soglia' : "l'IRPEF netta è a zero, e senza IRPEF non si pagano le addizionali"}.`
+          : (r.addizionali.regolaRegionale === "per fasce, sull'intero imponibile"
+              ? ` L'aliquota della fascia si applica all'intero imponibile, non per scaglioni:` + scaglioniTable(r.addizionali.dettaglioRegionale)
+              : r.addizionali.regolaRegionale === 'aliquota ridotta sotto soglia'
+                ? ` Sotto la soglia regionale vale l'aliquota ridotta su tutto l'imponibile:` + scaglioniTable(r.addizionali.dettaglioRegionale)
+                : r.addizionali.dettaglioRegionale
+                  ? ` Usa scaglioni propri:` + scaglioniTable(r.addizionali.dettaglioRegionale) +
+                    (r.addizionali.detrazioneRegionale > 0 ? `meno la detrazione regionale di fascia: <b>−${fmtEur(r.addizionali.detrazioneRegionale, 2)}</b>` : '')
+                  : `<br>${fmtEur(R, 2)} × ${fmtPct(TAX_2026.regioni[state.regioneId].aliquota)} = <b>${fmtEur(r.addizionali.regionale, 2)}</b>`)) +
         `<br>In busta reale le addizionali arrivano l'anno dopo, con saldo e acconto: qui le mostriamo per competenza.`,
     });
     html += voce({
@@ -601,7 +608,7 @@
         ${riga('Contributi INPS a carico del lavoratore', '9,19% sulla RAL' + (r.contributi.aggiuntivo > 0 ? ' + 1% oltre la prima fascia' : ''), '− ' + fmtEur(r.contributi.totale, 2), 'minus')}
         ${riga('Imponibile fiscale', 'RAL meno contributi: base di IRPEF e addizionali', fmtEur(r.imponibile, 2))}
         ${riga('IRPEF netta', `lorda ${fmtEur(r.irpef.lorda, 2)} − detrazione lavoro ${fmtEur(r.irpef.detrazioneLavoro, 2)}${r.irpef.ulterioreDetrazione > 0 ? ' − detrazione cuneo ' + fmtEur(r.irpef.ulterioreDetrazione, 2) : ''}`, '− ' + fmtEur(r.irpef.netta, 2), 'minus')}
-        ${riga('Addizionale regionale', r.addizionali.dettaglioRegionale ? 'per scaglioni regionali' : 'aliquota unica', '− ' + fmtEur(r.addizionali.regionale, 2), 'minus')}
+        ${riga('Addizionale regionale', r.addizionali.regolaRegionale, '− ' + fmtEur(r.addizionali.regionale, 2), 'minus')}
         ${riga('Addizionale comunale', r.addizionali.comunale === 0 && r.input.comuneEsenzione > 0 ? 'esente sotto soglia' : (r.addizionali.dettaglioComunale ? 'per scaglioni comunali, elenco AdE' : null), '− ' + fmtEur(r.addizionali.comunale, 2), 'minus')}
         ${r.bonus.sommaEsente > 0 ? riga('Somma esente taglio del cuneo', 'si aggiunge al netto', '+ ' + fmtEur(r.bonus.sommaEsente, 2), 'plus') : ''}
         ${r.bonus.trattamentoIntegrativo > 0 ? riga('Trattamento integrativo', 'si aggiunge al netto', '+ ' + fmtEur(r.bonus.trattamentoIntegrativo, 2), 'plus') : ''}

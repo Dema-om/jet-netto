@@ -157,6 +157,47 @@ console.log('— Vista azienda: costo e sgravi (L. 92/2012)');
   ok(calcolaSgravio('inventato', 30000) === null, 'sgravio sconosciuto rifiutato');
 }
 
+console.log('— Addizionali regionali 2026: strutture MEF regione per regione');
+{
+  // RAL tale che l'imponibile sia ~X: ral = X / (1 - 0.0919)
+  const ralPer = (imp) => imp / (1 - 0.0919);
+  const addReg = (imp, regioneId) =>
+    calcolaNetto({ ral: ralPer(imp), regioneId, comuneAliquota: 0, comuneEsenzione: 0 }).addizionali.regionale;
+  const vicino = (a, b) => Math.abs(a - b) < 0.5;
+
+  // Lazio, esempi CGIL Lazio verificati a mano (L.R. 20/2025)
+  ok(vicino(addReg(25000, 'lazio'), 432.50), 'Lazio 25.000: 1,73% ridotta su tutto = 432,50');
+  ok(vicino(addReg(28000, 'lazio'), 484.40), 'Lazio 28.000: ancora ridotta = 484,40');
+  ok(vicino(addReg(29000, 'lazio'), 665.70), 'Lazio 29.000: scaglioni pieni meno 60 = 665,70');
+  ok(vicino(addReg(32000, 'lazio'), 825.60), 'Lazio 32.000: scaglioni pieni senza detrazione = 825,60');
+
+  // Friuli-VG: aliquota della fascia sull'INTERO imponibile (MEF)
+  ok(vicino(addReg(14000, 'friuli-venezia-giulia'), 98.00), 'FVG 14.000: 0,70% su tutto = 98,00');
+  ok(vicino(addReg(16000, 'friuli-venezia-giulia'), 196.80), 'FVG 16.000: 1,23% su TUTTO (non progressivo) = 196,80');
+
+  // Valle d'Aosta: esenzione totale fino a 15.000
+  ok(addReg(14000, 'aosta-valley') === 0, 'VdA 14.000: esente');
+  ok(vicino(addReg(16000, 'aosta-valley'), 196.80), 'VdA 16.000: 1,23% su tutto = 196,80');
+
+  // Umbria: ridotta 1,23% fino a 28.000; sopra scaglioni pieni meno 150
+  ok(vicino(addReg(25000, 'umbria'), 307.50), 'Umbria 25.000: 1,23% su tutto = 307,50');
+  ok(vicino(addReg(40000, 'umbria'), 876.50), 'Umbria 40.000: 259,50+392,60+374,40−150 = 876,50');
+
+  // Piemonte e Trentino-A.A.: scaglioni MEF
+  ok(vicino(addReg(20000, 'piedmont'), 377.00), 'Piemonte 20.000: 243+134 = 377,00');
+  {
+    // sopra 56.224 il contributo aggiuntivo 1% sposta l'imponibile:
+    // l'atteso si calcola dall'imponibile effettivo
+    const r = calcolaNetto({ ral: ralPer(60000), regioneId: 'trentino-south-tyrol', comuneAliquota: 0, comuneEsenzione: 0 });
+    const atteso = 50000 * 0.0123 + (r.imponibile - 50000) * 0.0173;
+    ok(vicino(r.addizionali.regionale, atteso), "Trentino-A.A. oltre 50.000: 1,23% + 1,73% sull'eccedenza");
+  }
+
+  // Aliquote uniche corrette dal MEF
+  ok(vicino(addReg(20000, 'sicily'), 246.00), 'Sicilia 20.000: 1,23% (non 1,73) = 246,00');
+  ok(vicino(addReg(20000, 'calabria'), 346.00), 'Calabria 20.000: 1,73% (non 2,03) = 346,00');
+}
+
 console.log('— Condizione di debenza delle addizionali (no-tax area)');
 {
   // A RAL bassa l'IRPEF netta è 0: le addizionali NON sono dovute (art. 50 D.Lgs. 446/1997)

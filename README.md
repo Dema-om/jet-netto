@@ -14,7 +14,7 @@ controllo delle logiche. Il prototipo lo prende alla lettera su quattro piani:
 
 1. **Il motore è separato dalla UI.** Tutta la fiscalità sta in `engine.js`,
    una funzione pura senza dipendenze che gira identica nel browser e in Node.
-   Si testa da terminale: `node engine.test.js` (53 assert su formule, casi
+   Si testa da terminale: `node engine.test.js` (71 assert su formule, casi
    completi verificati a mano, monotonia del netto, ripartizione delle
    mensilità, dati dei comuni, costo azienda, incentivi e robustezza input). L'audit finale ha
    passato al setaccio 8.000 combinazioni regione × RAL senza anomalie e
@@ -151,10 +151,16 @@ payroll, dove la compliance è il mestiere. Il flusso di produzione sarebbe:
   mansioni d'ufficio, nessun fondo di categoria da CCNL.
 - Addizionali per competenza sull'anno (in busta reale: saldo e acconto
   sull'anno successivo).
-- Addizionale regionale: Lombardia, Friuli-Venezia Giulia e Lazio a scaglioni
-  progressivi reali 2026; le altre ad aliquota base pubblicata. Le deduzioni/
-  franchigie di Trento e Bolzano non sono modellate (dato non verificato in
-  modo univoco: dichiarato invece che stimato).
+- Addizionale regionale: tutte e 20 le regioni seguono la struttura della
+  propria pagina MEF 2026. Scaglioni progressivi dove ci sono (Lombardia,
+  Piemonte, Campania, Emilia-Romagna, Liguria, Marche, Molise, Puglia,
+  Toscana, Abruzzo, Trentino-A.A.), fasce sull'intero imponibile dove la
+  norma le prevede (Friuli-VG 0,70/1,23; Valle d'Aosta esente fino a
+  15.000), aliquote ridotte sotto soglia con detrazioni di fascia (Lazio
+  1,73% fino a 28.000 poi scaglioni con −60 €; Umbria 1,23% fino a 28.000
+  poi scaglioni con −150 €). Non modellate, e dichiarate: le agevolazioni
+  familiari regionali e le misure provinciali di Trento (deduzione 30.000)
+  e Bolzano (detrazione 430,50), perché la mappa non distingue le province.
 - Le addizionali seguono la condizione di debenza: sotto la no-tax area, dove
   l'IRPEF si azzera, non sono dovute (art. 50 D.Lgs. 446/1997).
 - Comuni: aliquote, scaglioni e soglie di esenzione REALI per 7.871 dei

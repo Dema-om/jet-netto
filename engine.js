@@ -91,33 +91,74 @@ const TAX_2026 = {
   // per scaglioni; per le altre regioni usiamo l'aliquota base
   // (semplificazione dichiarata: alcune regioni sono progressive).
   regioni: {
-    abruzzo:                 { nome: 'Abruzzo',                aliquota: 0.0173, capoluogo: "L'Aquila" },
-    basilicata:              { nome: 'Basilicata',             aliquota: 0.0123, capoluogo: 'Potenza' },
-    calabria:                { nome: 'Calabria',               aliquota: 0.0203, capoluogo: 'Catanzaro' },
-    campania:                { nome: 'Campania',               aliquota: 0.0203, capoluogo: 'Napoli' },
-    'emilia-romagna':        { nome: 'Emilia-Romagna',         aliquota: 0.0133, capoluogo: 'Bologna' },
+    // Aliquote 2026 verificate una per una sulle pagine regionali del MEF,
+    // Dipartimento delle Finanze (addregirpef). Tre strutture possibili:
+    //  - aliquota:   unica su tutto l'imponibile
+    //  - scaglioni:  progressivi (ogni aliquota solo sulla parte nella fascia)
+    //  - fasceIntero: l'aliquota della fascia si applica all'INTERO imponibile
+    // flatFino: sotto la soglia si paga l'aliquota ridotta su tutto;
+    // detrazioni: importi fissi sottratti all'imposta nella fascia indicata.
+    // Non modellate (dichiarato): agevolazioni familiari regionali e le
+    // misure provinciali di Trento (deduzione 30.000) e Bolzano (detrazione
+    // 430,50), perche' la mappa non distingue le due province autonome.
+    abruzzo: {
+      nome: 'Abruzzo', capoluogo: "L'Aquila",
+      scaglioni: [
+        { fino: 28000, aliquota: 0.0167 },
+        { fino: 50000, aliquota: 0.0287 },
+        { fino: Infinity, aliquota: 0.0333 },
+      ],
+    },
+    basilicata: { nome: 'Basilicata', aliquota: 0.0123, capoluogo: 'Potenza' },
+    calabria:   { nome: 'Calabria',   aliquota: 0.0173, capoluogo: 'Catanzaro' },
+    campania: {
+      nome: 'Campania', capoluogo: 'Napoli',
+      scaglioni: [
+        { fino: 15000, aliquota: 0.0173 },
+        { fino: 28000, aliquota: 0.0296 },
+        { fino: 50000, aliquota: 0.0320 },
+        { fino: Infinity, aliquota: 0.0333 },
+      ],
+    },
+    'emilia-romagna': {
+      nome: 'Emilia-Romagna', capoluogo: 'Bologna',
+      scaglioni: [
+        { fino: 15000, aliquota: 0.0133 },
+        { fino: 28000, aliquota: 0.0193 },
+        { fino: 50000, aliquota: 0.0278 },
+        { fino: Infinity, aliquota: 0.0333 },
+      ],
+    },
     'friuli-venezia-giulia': {
       nome: 'Friuli-Venezia Giulia', capoluogo: 'Trieste',
-      // Agevolazione redditi bassi 2026: 0,70% fino a 15.000, 1,23% oltre
-      scaglioni: [
+      // "Per reddito imponibile superiore a 15.000 l'aliquota e' pari a
+      // 1,23% sull'intero importo" (MEF): fasce, non scaglioni progressivi
+      fasceIntero: [
         { fino: 15000, aliquota: 0.0070 },
         { fino: Infinity, aliquota: 0.0123 },
       ],
     },
     lazio: {
       nome: 'Lazio', capoluogo: 'Roma',
-      // Tra le più alte d'Italia 2026: 1,73% / 2,73% / 2,93% / 3,33%
+      // L.R. 20 del 31/12/2025: fino a 28.000 l'1,73% su tutto; oltre,
+      // scaglioni 1,73/3,33 con detrazione di 60 euro tra 28.001 e 30.000
+      flatFino: { soglia: 28000, aliquota: 0.0173 },
       scaglioni: [
         { fino: 15000, aliquota: 0.0173 },
-        { fino: 28000, aliquota: 0.0273 },
-        { fino: 50000, aliquota: 0.0293 },
         { fino: Infinity, aliquota: 0.0333 },
       ],
+      detrazioni: [{ da: 28000, a: 30000, importo: 60 }],
     },
-    liguria:                 { nome: 'Liguria',                aliquota: 0.0123, capoluogo: 'Genova' },
+    liguria: {
+      nome: 'Liguria', capoluogo: 'Genova',
+      scaglioni: [
+        { fino: 28000, aliquota: 0.0123 },
+        { fino: 50000, aliquota: 0.0318 },
+        { fino: Infinity, aliquota: 0.0323 },
+      ],
+    },
     lombardy: {
       nome: 'Lombardia', capoluogo: 'Milano',
-      // Scaglioni 2026: 1,23% fino a 15k, 1,58% 15–28k, 1,72% 28–50k, 1,73% oltre.
       scaglioni: [
         { fino: 15000, aliquota: 0.0123 },
         { fino: 28000, aliquota: 0.0158 },
@@ -125,17 +166,85 @@ const TAX_2026 = {
         { fino: Infinity, aliquota: 0.0173 },
       ],
     },
-    marche:                { nome: 'Marche',              aliquota: 0.0123, capoluogo: 'Ancona' },
-    molise:                { nome: 'Molise',              aliquota: 0.0173, capoluogo: 'Campobasso' },
-    piedmont:              { nome: 'Piemonte',            aliquota: 0.0162, capoluogo: 'Torino' },
-    apulia:                { nome: 'Puglia',              aliquota: 0.0133, capoluogo: 'Bari' },
-    sardinia:              { nome: 'Sardegna',            aliquota: 0.0123, capoluogo: 'Cagliari' },
-    sicily:                { nome: 'Sicilia',             aliquota: 0.0173, capoluogo: 'Palermo' },
-    tuscany:               { nome: 'Toscana',             aliquota: 0.0142, capoluogo: 'Firenze' },
-    'trentino-south-tyrol': { nome: 'Trentino-Alto Adige', aliquota: 0.0123, capoluogo: 'Trento' },
-    umbria:                { nome: 'Umbria',              aliquota: 0.0123, capoluogo: 'Perugia' },
-    'aosta-valley':       { nome: "Valle d'Aosta",       aliquota: 0.0120, capoluogo: 'Aosta' },
-    veneto:                { nome: 'Veneto',              aliquota: 0.0123, capoluogo: 'Venezia' },
+    marche: {
+      nome: 'Marche', capoluogo: 'Ancona',
+      scaglioni: [
+        { fino: 15000, aliquota: 0.0123 },
+        { fino: 28000, aliquota: 0.0153 },
+        { fino: 50000, aliquota: 0.0170 },
+        { fino: Infinity, aliquota: 0.0173 },
+      ],
+    },
+    molise: {
+      nome: 'Molise', capoluogo: 'Campobasso',
+      scaglioni: [
+        { fino: 15000, aliquota: 0.0203 },
+        { fino: 28000, aliquota: 0.0223 },
+        { fino: Infinity, aliquota: 0.0363 },
+      ],
+    },
+    piedmont: {
+      nome: 'Piemonte', capoluogo: 'Torino',
+      scaglioni: [
+        { fino: 15000, aliquota: 0.0162 },
+        { fino: 28000, aliquota: 0.0268 },
+        { fino: 50000, aliquota: 0.0331 },
+        { fino: Infinity, aliquota: 0.0333 },
+      ],
+    },
+    apulia: {
+      nome: 'Puglia', capoluogo: 'Bari',
+      scaglioni: [
+        { fino: 15000, aliquota: 0.0133 },
+        { fino: 28000, aliquota: 0.0213 },
+        { fino: 50000, aliquota: 0.0323 },
+        { fino: Infinity, aliquota: 0.0333 },
+      ],
+    },
+    sardinia: { nome: 'Sardegna', aliquota: 0.0123, capoluogo: 'Cagliari' },
+    sicily:   { nome: 'Sicilia',  aliquota: 0.0123, capoluogo: 'Palermo' },
+    tuscany: {
+      nome: 'Toscana', capoluogo: 'Firenze',
+      scaglioni: [
+        { fino: 15000, aliquota: 0.0142 },
+        { fino: 28000, aliquota: 0.0143 },
+        { fino: 50000, aliquota: 0.0332 },
+        { fino: Infinity, aliquota: 0.0333 },
+      ],
+    },
+    'trentino-south-tyrol': {
+      nome: 'Trentino-Alto Adige', capoluogo: 'Trento',
+      // Parte comune alle due province; le agevolazioni provinciali
+      // (Trento: deduzione 30.000; Bolzano: detrazione 430,50) non sono
+      // modellate perche' la mappa non distingue le province
+      scaglioni: [
+        { fino: 50000, aliquota: 0.0123 },
+        { fino: Infinity, aliquota: 0.0173 },
+      ],
+    },
+    umbria: {
+      nome: 'Umbria', capoluogo: 'Perugia',
+      // L.R. 2/2025: le maggiorazioni non si applicano fino a 28.000
+      // (resta l'1,23% su tutto); oltre, scaglioni pieni con detrazione
+      // di 150 euro tra 28.001 e 50.000
+      flatFino: { soglia: 28000, aliquota: 0.0123 },
+      scaglioni: [
+        { fino: 15000, aliquota: 0.0173 },
+        { fino: 28000, aliquota: 0.0302 },
+        { fino: 50000, aliquota: 0.0312 },
+        { fino: Infinity, aliquota: 0.0333 },
+      ],
+      detrazioni: [{ da: 28000, a: 50000, importo: 150 }],
+    },
+    'aosta-valley': {
+      nome: "Valle d'Aosta", capoluogo: 'Aosta',
+      // Esenzione totale fino a 15.000; oltre, 1,23% sull'intero imponibile
+      fasceIntero: [
+        { fino: 15000, aliquota: 0 },
+        { fino: Infinity, aliquota: 0.0123 },
+      ],
+    },
+    veneto: { nome: 'Veneto', aliquota: 0.0123, capoluogo: 'Venezia' },
   },
 
   // Addizionale comunale di default (personalizzabile in UI).
@@ -150,6 +259,44 @@ const TAX_2026 = {
     Roma:   { aliquota: 0.009, esenzione: 14000 },
   },
 };
+
+/**
+ * Addizionale regionale secondo la struttura della regione (pagine MEF):
+ * aliquota unica, scaglioni progressivi, fasce sull'intero imponibile,
+ * aliquota ridotta sotto soglia, detrazioni fisse di fascia.
+ */
+function addizionaleRegionale(imponibile, regione) {
+  if (regione.fasceIntero) {
+    const fascia = regione.fasceIntero.find((f) => imponibile <= f.fino);
+    const totale = imponibile * fascia.aliquota;
+    return {
+      totale,
+      dettaglio: totale > 0 ? [{ da: 0, a: imponibile, aliquota: fascia.aliquota, importo: totale }] : null,
+      regola: totale > 0 ? 'per fasce, sull\'intero imponibile' : 'esente sotto soglia',
+      detrazione: 0,
+    };
+  }
+  if (regione.flatFino && imponibile <= regione.flatFino.soglia) {
+    const totale = imponibile * regione.flatFino.aliquota;
+    return {
+      totale,
+      dettaglio: [{ da: 0, a: imponibile, aliquota: regione.flatFino.aliquota, importo: totale }],
+      regola: 'aliquota ridotta sotto soglia',
+      detrazione: 0,
+    };
+  }
+  if (regione.scaglioni) {
+    const calc = perScaglioni(imponibile, regione.scaglioni);
+    let detrazione = 0;
+    if (regione.detrazioni) {
+      for (const d of regione.detrazioni) {
+        if (imponibile > d.da && imponibile <= d.a) detrazione = d.importo;
+      }
+    }
+    return { totale: Math.max(0, calc.totale - detrazione), dettaglio: calc.dettaglio, regola: 'per scaglioni', detrazione };
+  }
+  return { totale: imponibile * regione.aliquota, dettaglio: null, regola: 'aliquota unica', detrazione: 0 };
+}
 
 /** Applica scaglioni progressivi a un imponibile. Ritorna { totale, dettaglio[] }. */
 function perScaglioni(imponibile, scaglioni) {
@@ -209,10 +356,8 @@ function calcolaNetto(p) {
   // area, dove l'IRPEF si azzera, non si pagano nemmeno le addizionali.
   const irpefDovuta = irpefNetta > 0;
   const addRegionaleCalc = !irpefDovuta
-    ? { totale: 0, dettaglio: null }
-    : (regione.scaglioni
-        ? perScaglioni(imponibile, regione.scaglioni)
-        : { totale: imponibile * regione.aliquota, dettaglio: null });
+    ? { totale: 0, dettaglio: null, regola: 'non dovuta', detrazione: 0 }
+    : addizionaleRegionale(imponibile, regione);
   const addRegionale = addRegionaleCalc.totale;
 
   const comAliquota = p.comuneAliquota ?? T.comuneDefault.aliquota;
@@ -258,7 +403,7 @@ function calcolaNetto(p) {
       ulterioreDetrazione,
       netta: irpefNetta,
     },
-    addizionali: { regionale: addRegionale, dettaglioRegionale: addRegionaleCalc.dettaglio, comunale: addComunale, dettaglioComunale: comCalc.dettaglio },
+    addizionali: { regionale: addRegionale, dettaglioRegionale: addRegionaleCalc.dettaglio, regolaRegionale: addRegionaleCalc.regola, detrazioneRegionale: addRegionaleCalc.detrazione, comunale: addComunale, dettaglioComunale: comCalc.dettaglio },
     bonus: { sommaEsente, trattamentoIntegrativo: trattIntegrativo },
     totaleTrattenute,
     nettoAnnuo,
