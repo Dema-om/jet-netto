@@ -193,10 +193,12 @@ payroll, dove la compliance è il mestiere. Il flusso di produzione sarebbe:
 
 Le scelte minute d'interfaccia sono ragionate quanto quelle fiscali:
 
-- **Fonti che non ti perdono**: il click sul numerino di una fonte apre la
-  sezione Fonti, scorre centrando la voce e la illumina un attimo; da lì un
-  altro click porta al documento ufficiale. Al passaggio, il tooltip anticipa
-  quale fonte è.
+- **Fonti che non ti perdono**: il click sul numerino apre la sezione Fonti,
+  scorre centrando la voce e la illumina un attimo; da lì un altro click
+  porta al documento ufficiale. Per il viaggio inverso compare un tasto tondo
+  in basso a destra che ti riporta alla voce da cui eri partito,
+  evidenziandola allo stesso modo: e se risali per conto tuo, capisce di non
+  servire e sparisce da solo. Al passaggio, il tooltip anticipa quale fonte è.
 - **La soglia parla in RAL**: l'esenzione comunale per legge vale
   sull'imponibile, ma l'utente conosce la sua RAL, quindi gliela traduciamo
   ("con una RAL fino a ~25.300 €").
