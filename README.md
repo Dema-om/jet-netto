@@ -209,6 +209,10 @@ Le scelte minute d'interfaccia sono ragionate quanto quelle fiscali:
 - **Il contratto si chiede solo a chi serve**: indeterminato/determinato
   esiste solo nel flusso azienda, perché sul netto del dipendente non cambia
   nulla.
+- **Mobile first sul serio**: layout verificato a 375px senza scroll
+  orizzontale, avanzamento ridotto ai soli pallini sugli schermi stretti,
+  campi in colonna dove le etichette andrebbero a capo, target tattili
+  da 44px.
 
 Le stesse scelte, con più contesto, sono nella pagina
 [credits](https://jetnetto.zetakiwi.com/credits.html) del sito.
