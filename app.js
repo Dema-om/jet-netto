@@ -18,6 +18,8 @@
   };
 
   const $ = (sel) => document.querySelector(sel);
+  // Su schermi touch niente autofocus (aprirebbe la tastiera) e i chip la chiudono
+  const TOUCH = window.matchMedia('(pointer: coarse)').matches;
   const fmtEur = (n, dec = 0) =>
     n.toLocaleString('it-IT', { style: 'currency', currency: 'EUR', minimumFractionDigits: dec, maximumFractionDigits: dec });
   const fmtPct = (n) => (n * 100).toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%';
@@ -846,7 +848,7 @@
 
     $('#step1-next').addEventListener('click', () => { renderCity(); goTo(2); });
     $('#step2-back').addEventListener('click', () => goTo(1));
-    $('#step2-next').addEventListener('click', () => { goTo(3); $('#ral-input').focus(); });
+    $('#step2-next').addEventListener('click', () => { goTo(3); if (!TOUCH) $('#ral-input').focus(); });
     $('#step3-back').addEventListener('click', () => goTo(2));
     $('#calc-btn').addEventListener('click', calculate);
     const stampa = (nome) => {
@@ -885,7 +887,7 @@
       if (e.key !== 'Enter' || e.target.tagName === 'BUTTON' || e.target.tagName === 'SELECT') return;
       if (state.step === 3 && validateRal(true)) calculate();
       else if (state.step === 1 && state.regioneId) { renderCity(); goTo(2); }
-      else if (state.step === 2) { goTo(3); $('#ral-input').focus(); }
+      else if (state.step === 2) { goTo(3); if (!TOUCH) $('#ral-input').focus(); }
     });
 
     // Deep link: ?ral=30000&regione=lombardy&mensilita=13 salta al risultato.
