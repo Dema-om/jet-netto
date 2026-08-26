@@ -10,7 +10,7 @@ oppure servi la cartella con un qualunque static server.
 ## Perché è fatto così
 
 Il brief dice che lo scopo non è la velocità con cui si assembla un tool, ma il
-controllo delle logiche. Il prototipo lo prende alla lettera su tre piani:
+controllo delle logiche. Il prototipo lo prende alla lettera su quattro piani:
 
 1. **Il motore è separato dalla UI.** Tutta la fiscalità sta in `engine.js`,
    una funzione pura senza dipendenze che gira identica nel browser e in Node.
@@ -21,9 +21,10 @@ controllo delle logiche. Il prototipo lo prende alla lettera su tre piani:
    verificato il contrasto WCAG della palette (lime su nero: 14:1, AAA;
    rosso delle trattenute: danger-700 di Jet HR, 6,8:1).
 2. **Le logiche sono nel prodotto, non solo nel codice.** Ogni voce del
-   risultato ha un espansore "perché questo numero" con la formula di legge
-   compilata con i numeri dell'utente, più una sezione finale con la catena di
-   calcolo in sette passaggi.
+   risultato si apre sulla propria spiegazione: prima le parole, poi la
+   formula di legge compilata con i numeri dell'utente, poi gli eventuali
+   scaglioni. In fondo, la catena di calcolo in sette passaggi e le
+   semplificazioni con le loro motivazioni.
 3. **La residenza è un input vero.** La mappa dell'Italia non è decorativa: la
    regione determina l'addizionale regionale (dati 2026 per tutte le 20
    regioni, Lombardia con i suoi scaglioni progressivi). Il comune si cerca
@@ -95,10 +96,12 @@ meno di nessuna stima.
 
 ## Report e condivisione
 
-- **Scarica il report (PDF)**: dal risultato, un documento brandizzato con
-  dati inseriti, cascata lordo→netto, calendario delle mensilità, catena di
-  calcolo e fonti. Generato client-side con lo stylesheet di stampa: nessun
-  backend, nessun dato che lascia il browser.
+- **Scarica il report (PDF)**: dal risultato, un documento brandizzato per
+  ognuna delle due viste: per il dipendente dati inseriti, cascata
+  lordo→netto, calendario delle mensilità e TFR; per l'azienda la proposta,
+  la scala RAL→costo e l'incentivo selezionato. Fonti in calce, una pagina
+  ciascuno, generati client-side con lo stylesheet di stampa: nessun backend,
+  nessun dato che lascia il browser.
 - **Deep link**: `?ral=30000&regione=lombardy&mensilita=13` apre direttamente
   il risultato (aggiungi `&vista=hr` per la vista azienda). Una simulazione
   si condivide con un URL.
@@ -134,11 +137,15 @@ payroll, dove la compliance è il mestiere. Il flusso di produzione sarebbe:
 
 ## Semplificazioni dichiarate
 
-- Impiegato a tempo indeterminato, full time, 12 mesi lavorati, nessun carico
-  familiare, nessuna agevolazione. Il part time non richiede un campo: il
-  calcolo è lineare nella RAL, basta inserire quella effettiva. Il tempo
-  determinato non è modellato (lato azienda avrebbe un contributo addizionale
-  dell'1,4% e incentivi di durata ridotta).
+- Impiegato full time, 12 mesi lavorati, nessun carico familiare, nessuna
+  agevolazione. Il part time non richiede un campo: il calcolo è lineare
+  nella RAL, basta inserire quella effettiva.
+- Il tipo di contratto (indeterminato/determinato) si sceglie SOLO nel flusso
+  azienda, ed è una scelta di design: sul netto del dipendente non cambia
+  nulla (stessa IRPEF, stessi contributi), quindi lato dipendente sarebbe un
+  campo morto; lato azienda invece il determinato aggiunge il contributo
+  addizionale dell'1,4% (art. 2, c. 28, L. 92/2012) e riduce la durata degli
+  incentivi da 18 a 12 mesi, e infatti lì il toggle c'è e agisce su entrambi.
 - Vista azienda: INPS datore 23,81%, TFR 6,91%, INAIL stimato 0,40% per
   mansioni d'ufficio, nessun fondo di categoria da CCNL.
 - Addizionali per competenza sull'anno (in busta reale: saldo e acconto
@@ -153,8 +160,11 @@ payroll, dove la compliance è il mestiere. Il flusso di produzione sarebbe:
   nell'elenco usano un valore tipico dichiarato. I "casi particolari"
   agevolativi dell'elenco (colonna Tipizzazione: esenzioni per categorie
   specifiche) non sono modellati.
-- TFR escluso (retribuzione differita), massimale contributivo post-1996
-  ignorato, trattamento integrativo semplificato alla sola detrazione lavoro.
+- TFR fuori dal netto perché è retribuzione differita che non passa dalla
+  busta: ma non è ignorato: il dipendente vede quanto matura ogni anno
+  (6,91% della RAL) e nel costo azienda è conteggiato per intero.
+- Massimale contributivo post-1996 ignorato; trattamento integrativo
+  semplificato alla sola detrazione lavoro.
 - Nessun contributo di categoria oltre l'INPS (es. fondi CCNL).
 
 ## Fonti
@@ -165,18 +175,24 @@ payroll, dove la compliance è il mestiere. Il flusso di produzione sarebbe:
 - Detrazione lavoro dipendente: art. 13 TUIR (DPR 917/1986).
 - Taglio del cuneo (somma esente + ulteriore detrazione) e trattamento
   integrativo: L. 207/2024, art. 1.
-- Addizionale regionale Lombardia (scaglioni) e tabella regioni 2026: delibere
-  regionali vigenti; comunale Milano: delibera comunale (0,80%, esenzione
-  23.000 €).
+- Addizionale regionale: scaglioni Lombardia e aliquote regionali 2026 dalle
+  delibere vigenti (MEF, fiscalità locale).
+- Addizionali comunali: elenco annuale ufficiale dell'Agenzia delle Entrate
+  (modulistica 2026) per tutti i comuni; verifiche puntuali su Comune di
+  Milano (0,80%, esenzione 23.000 €) e Roma Capitale (0,90%, esenzione
+  14.000 €).
+- Incentivi all'assunzione: L. 92/2012 (art. 4 e art. 2 c. 10-bis).
 
 ## Struttura
 
 ```
-index.html      pagina unica: wizard a 3 step + risultato
-styles.css      design system (token estratti dal brand Jet HR)
-app.js          logica UI: mappa, step, validazioni, rendering risultato
+index.html      pagina unica: wizard a 3 step + risultato (due viste)
+credits.html    metodo, affidabilità e contatti
+styles.css      design system (token estratti dal brand Jet HR) + stampa
+app.js          logica UI: mappa, step, validazioni, rendering, report
 engine.js       motore fiscale puro (browser + Node)
 engine.test.js  test: node engine.test.js
+comuni.js       7.904 comuni ISTAT con i dati dell'elenco AdE
 italy-map.js    geometrie SVG delle regioni (@svg-maps/italy, MIT)
 ```
 
