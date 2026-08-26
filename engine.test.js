@@ -198,6 +198,50 @@ console.log('— Addizionali regionali 2026: strutture MEF regione per regione')
   ok(vicino(addReg(20000, 'calabria'), 346.00), 'Calabria 20.000: 1,73% (non 2,03) = 346,00');
 }
 
+console.log('— Province autonome: agevolazioni dedotte dalla provincia');
+{
+  const ralPer2 = (imp) => imp / (1 - 0.0919);
+  const taa = (imp, prov) =>
+    calcolaNetto({ ral: ralPer2(imp), regioneId: 'trentino-south-tyrol', provinciaTAA: prov, comuneAliquota: 0, comuneEsenzione: 0 }).addizionali;
+  const vicino2 = (a, b) => Math.abs(a - b) < 0.5;
+
+  // Trento: deduzione 30.000 -> azzerata fino a 30.000 di imponibile
+  ok(taa(25000, 'trento').regionale === 0, 'Trento 25.000: azzerata dalla deduzione provinciale');
+  ok(taa(29999, 'trento').regionale === 0, 'Trento 29.999: ancora azzerata');
+  ok(vicino2(taa(40000, 'trento').regionale, 492.00), 'Trento 40.000: scaglioni pieni = 492,00');
+
+  // Bolzano: detrazione 430,50 fino a 90.000
+  ok(taa(30000, 'bolzano').regionale === 0, 'Bolzano 30.000: 369 − 430,50 -> zero');
+  ok(vicino2(taa(50000, 'bolzano').regionale, 184.50), 'Bolzano 50.000: 615 − 430,50 = 184,50');
+
+  // Senza provincia: scaglioni comuni (retrocompatibile)
+  ok(vicino2(taa(25000, undefined).regionale, 307.50), 'TAA senza provincia: scaglioni comuni = 307,50');
+}
+
+console.log('— Apprendistato lato azienda: 11,61% e niente 1,4%');
+{
+  const { calcolaCostoAzienda } = require('./engine.js');
+  const app2 = calcolaCostoAzienda(25000, { apprendistato: true });
+  ok(Math.abs(app2.inps - 25000 * 0.1161) < 0.01, 'INPS datore 11,61% della RAL');
+  const appDet = calcolaCostoAzienda(25000, { apprendistato: true, determinato: true });
+  ok(appDet.addizionale === 0, "apprendista escluso dall'1,4% anche se a termine (art. 2 c. 29 L. 92/2012)");
+  const std2 = calcolaCostoAzienda(25000, {});
+  ok(std2.totale - app2.totale > 3000, 'apprendista: oltre 3.000 € di costo in meno su 25.000 di RAL');
+}
+
+console.log('— Apprendistato: contributi ridotti al 5,84%');
+{
+  const std = calcolaNetto({ ral: 25000, regioneId: 'lombardy', comuneAliquota: 0.008, comuneEsenzione: 23000 });
+  const app = calcolaNetto({ ral: 25000, regioneId: 'lombardy', comuneAliquota: 0.008, comuneEsenzione: 23000, apprendistato: true });
+  ok(Math.abs(app.contributi.totale - 25000 * 0.0584) < 0.01, 'contributi = 5,84% secco della RAL');
+  ok(app.contributi.apprendistato === true && std.contributi.apprendistato === false, 'flag esposto nel risultato');
+  ok(app.nettoAnnuo > std.nettoAnnuo, 'a parità di RAL il netto sale');
+  ok(app.imponibile > std.imponibile, "l'imponibile sale (meno contributi)");
+  // niente contributo aggiuntivo oltre la prima fascia in apprendistato
+  const alto = calcolaNetto({ ral: 70000, regioneId: 'lombardy', apprendistato: true });
+  ok(alto.contributi.aggiuntivo === 0, 'apprendistato: nessun 1% aggiuntivo (dichiarato)');
+}
+
 console.log('— Condizione di debenza delle addizionali (no-tax area)');
 {
   // A RAL bassa l'IRPEF netta è 0: le addizionali NON sono dovute (art. 50 D.Lgs. 446/1997)

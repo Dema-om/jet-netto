@@ -14,6 +14,8 @@
     mensilita: 13,
     vista: 'dip',
     contratto: 'ind',
+    apprendistato: false,
+    provinciaTAA: null,
     lastResult: null,
   };
 
@@ -170,8 +172,29 @@
     return lista.find((c) => c[0] === nome) || null;
   }
 
+  const BOLZANO = new Set(window.COMUNI_BOLZANO || []);
+
+  // In Trentino-Alto Adige l'agevolazione e' provinciale: lo diciamo subito,
+  // qui al comune, perche' nessun altro campo lo chiede
+  // Aliquota comunale a zero e nessuno scaglione = il comune non l'ha
+  // proprio deliberata (tutto il Trentino-Alto Adige, e altri)
+  function comuneNonPrevista(r) {
+    return !r.addizionali.dettaglioComunale && (r.input.comuneAliquota || 0) === 0 && !state.comuneScaglioni;
+  }
+
+  function notaProvincia() {
+    if (state.provinciaTAA === 'trento') return " Comune in provincia di Trento: l'addizionale regionale si azzera fino a 30.000 € di imponibile (deduzione provinciale).";
+    if (state.provinciaTAA === 'bolzano') return " Comune in provincia di Bolzano: dall'addizionale regionale si sottraggono 430,50 € (detrazione provinciale, fino a 90.000 € di imponibile).";
+    return '';
+  }
+
   function applyComune(nome) {
     state.comuneNome = nome;
+    // In Trentino-Alto Adige la provincia decide l'agevolazione regionale:
+    // la deduciamo dal comune (elenco ISTAT), senza chiedere nulla
+    state.provinciaTAA = state.regioneId === 'trentino-south-tyrol'
+      ? (BOLZANO.has(nome) ? 'bolzano' : 'trento')
+      : null;
     const c = findComune(nome); // [nome, aliquota|aliquote[], esenzione, tipologia, flagMancante?]
     if (c && !c[4]) {
       const [, a, esenzione, tipologia] = c;
@@ -182,23 +205,26 @@
       } else {
         state.comuneScaglioni = null;
         state.comuneAliquota = a / 100;
-        $('#city-aliquota').textContent = fmtPct(state.comuneAliquota);
+        $('#city-aliquota').textContent = a === 0 ? 'non prevista' : fmtPct(state.comuneAliquota);
       }
       state.comuneEsenzione = esenzione;
-      $('#city-source').textContent = 'Aliquota e soglia dall\'elenco ufficiale dell\'Agenzia delle Entrate (fonte 10).';
+      $('#city-source').textContent = 'Aliquota e soglia dall\'elenco ufficiale dell\'Agenzia delle Entrate (fonte 10).' + notaProvincia();
     } else {
       state.comuneScaglioni = null;
       state.comuneAliquota = TAX_2026.comuneDefault.aliquota;
       state.comuneEsenzione = TAX_2026.comuneDefault.esenzione;
       $('#city-aliquota').textContent = fmtPct(state.comuneAliquota);
-      $('#city-source').textContent = 'Comune non presente nell\'elenco AdE (istituzione recente): valore tipico 0,80%, correggilo se serve.';
+      $('#city-source').textContent = 'Comune non presente nell\'elenco AdE (istituzione recente): valore tipico 0,80%, correggilo se serve.' + notaProvincia();
     }
     if (state.comuneEsenzione > 0) {
       // La soglia di legge vale sull'imponibile: la traduciamo in RAL
       const soglRal = Math.round(state.comuneEsenzione / (1 - TAX_2026.inps.aliquota) / 100) * 100;
       $('#city-esenzione').textContent = 'con una RAL fino a ~' + fmtEur(soglRal);
     } else {
-      $('#city-esenzione').textContent = 'nessuno: si paga sempre';
+      // Niente sentenze secche: il valore e' asciutto, la spiegazione al passaggio
+      $('#city-esenzione').innerHTML = state.comuneAliquota === 0 && !state.comuneScaglioni
+        ? `<span class="tip" tabindex="0" data-tip="${state.comuneNome} non ha deliberato un'addizionale comunale: qui non si paga nulla, qualunque sia il reddito.">tutti</span>`
+        : `<span class="tip" tabindex="0" data-tip="A ${state.comuneNome} non è prevista una soglia di esenzione: l'addizionale comunale si paga dal primo euro di imponibile.">nessuno</span>`;
     }
   }
 
@@ -400,6 +426,7 @@
     9: ['Roma Capitale, addizionale IRPEF', 'https://www.comune.roma.it/web/it/scheda-servizi.page?contentId=INF41403'],
     10: ['Agenzia delle Entrate, elenco annuale addizionali comunali 2026', 'https://www.agenziaentrate.gov.it/portale/documents/d/guest/elenco-annuale-addizionale-comunale-modulistica-2026_def'],
     11: ['L. 92/2012 (riforma Fornero), Normattiva', 'https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:2012-06-28;92~art4'],
+    12: ['L. 296/2006, art. 1 c. 773 (contributi apprendisti), Normattiva', 'https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:2006-12-27;296~art1'],
   };
   const fn = (...nums) => nums.map((n) =>
     `<sup class="fn"><a href="#fonte-${n}" title="Fonte: ${FONTI[n][0]}">${n}</a></sup>`).join('');
@@ -464,9 +491,11 @@
     $('#rh-mensile').innerHTML = `${fmtEur(d.ordinario)}<small> /mese</small>`;
     $('#rh-extra').innerHTML = d.extraCount === 0 ? '' :
       d.extraCount === 1
-        ? `più la tredicesima a dicembre: ${fmtEur(d.extra)}`
-        : `più tredicesima e quattordicesima: ${fmtEur(d.extra)} l'una`;
+        ? `più la tredicesima a dicembre: <b>${fmtEur(d.extra)}</b>`
+        : `più tredicesima e quattordicesima: <b>${fmtEur(d.extra)}</b> l'una`;
     $('#rh-annuo').innerHTML = `<span>netto annuo</span>${fmtEur(r.nettoAnnuo)}`;
+    const quota = r.input.ral > 0 ? 1 - r.nettoAnnuo / r.input.ral : 0;
+    $('#rh-quota').innerHTML = `in tasse e contributi va il <b>${(quota * 100).toLocaleString('it-IT', { maximumFractionDigits: 1 })}%</b> della RAL`;
     $('#bd-total').innerHTML = `− ${fmtEur(r.totaleTrattenute, 2)}`;
     $('#bd-details').open = false;
 
@@ -494,12 +523,14 @@
       amount: ral, bar: 100,
     });
     html += voce({
-      nome: 'Contributi INPS', refs: fn(3),
-      sub: 'il 9,19% che va alla previdenza',
+      nome: 'Contributi INPS', refs: r.contributi.apprendistato ? fn(3, 12) : fn(3),
+      sub: r.contributi.apprendistato ? 'il 5,84% ridotto dell\'apprendistato' : 'il 9,19% che va alla previdenza',
       amount: r.contributi.totale, sign: '-', bar: pct(r.contributi.totale),
       body:
-        `Il 33% della tua retribuzione va alla previdenza, ma in busta ne vedi solo una parte: il datore versa il 23,81%, tu il <b>9,19%</b>.<br>` +
-        `${fmtEur(ral)} × 9,19% = <b>${fmtEur(r.contributi.base, 2)}</b>` +
+        (r.contributi.apprendistato
+          ? `In apprendistato la tua quota scende al <b>5,84%</b> (invece del 9,19%), e l'aliquota ridotta resta per un intero anno dopo la fine del periodo formativo.<br>`
+          : `Il 33% della tua retribuzione va alla previdenza, ma in busta ne vedi solo una parte: il datore versa il 23,81%, tu il <b>9,19%</b>.<br>`) +
+        `${fmtEur(ral)} × ${fmtPct(r.contributi.aliquota)} = <b>${fmtEur(r.contributi.base, 2)}</b>` +
         (r.contributi.aggiuntivo > 0
           ? `<br>La parte di RAL oltre la prima fascia pensionabile (${fmtEur(TAX_2026.inps.primaFascia)}) paga un 1% in più: <b>${fmtEur(r.contributi.aggiuntivo, 2)}</b>`
           : '') +
@@ -536,26 +567,32 @@
       body:
         `${r.input.regione} tassa lo stesso imponibile dell'IRPEF (${fmtEur(R, 2)}), non la RAL.` +
         (r.addizionali.regionale === 0
-          ? ` Qui non è dovuta: ${r.addizionali.regolaRegionale === 'esente sotto soglia' ? 'la regione esenta gli imponibili sotto la sua soglia' : "l'IRPEF netta è a zero, e senza IRPEF non si pagano le addizionali"}.`
+          ? ` Qui non è dovuta: ${r.addizionali.regolaRegionale === 'esente sotto soglia' ? 'la regione esenta gli imponibili sotto la sua soglia' : r.addizionali.regolaRegionale === 'azzerata dalla deduzione provinciale' ? 'la Provincia di Trento la azzera con una deduzione per gli imponibili fino a 30.000 €' : "l'IRPEF netta è a zero, e senza IRPEF non si pagano le addizionali"}.`
           : (r.addizionali.regolaRegionale === "per fasce, sull'intero imponibile"
               ? ` L'aliquota della fascia si applica all'intero imponibile, non per scaglioni:` + scaglioniTable(r.addizionali.dettaglioRegionale)
               : r.addizionali.regolaRegionale === 'aliquota ridotta sotto soglia'
                 ? ` Sotto la soglia regionale vale l'aliquota ridotta su tutto l'imponibile:` + scaglioniTable(r.addizionali.dettaglioRegionale)
                 : r.addizionali.dettaglioRegionale
                   ? ` Usa scaglioni propri:` + scaglioniTable(r.addizionali.dettaglioRegionale) +
-                    (r.addizionali.detrazioneRegionale > 0 ? `meno la detrazione regionale di fascia: <b>−${fmtEur(r.addizionali.detrazioneRegionale, 2)}</b>` : '')
+                    (r.addizionali.detrazioneRegionale > 0 ? `meno ${r.addizionali.detrazioneRegionaleNota || 'la detrazione'}: <b>−${fmtEur(r.addizionali.detrazioneRegionale, 2)}</b>` : '')
                   : `<br>${fmtEur(R, 2)} × ${fmtPct(TAX_2026.regioni[state.regioneId].aliquota)} = <b>${fmtEur(r.addizionali.regionale, 2)}</b>`)) +
         `<br>In busta reale le addizionali arrivano l'anno dopo, con saldo e acconto: qui le mostriamo per competenza.`,
     });
     html += voce({
       nome: 'Addizionale comunale', refs: fn(7, 10),
-      sub: r.addizionali.comunale === 0 && r.input.comuneEsenzione > 0
-        ? 'esente: sei sotto la soglia del tuo comune'
+      sub: r.addizionali.comunale === 0
+        ? (comuneNonPrevista(r) ? 'il tuo comune non la applica'
+           : r.input.comuneEsenzione > 0 && R <= r.input.comuneEsenzione ? 'esente: sei sotto la soglia del tuo comune'
+           : 'non dovuta quest\'anno')
         : 'la quota che va al tuo comune',
       amount: r.addizionali.comunale, sign: '-', bar: pct(r.addizionali.comunale),
       body:
-        (r.addizionali.comunale === 0 && r.input.comuneEsenzione > 0
+        (comuneNonPrevista(r)
+          ? `${state.comuneNome} non ha deliberato un'addizionale comunale: qui <b>non si paga nulla</b>, qualunque sia il reddito.`
+          : r.addizionali.comunale === 0 && r.input.comuneEsenzione > 0 && R <= r.input.comuneEsenzione
           ? `${state.comuneNome} non la applica sotto ${fmtEur(r.input.comuneEsenzione)} di imponibile, e il tuo (${fmtEur(R, 2)}) è sotto: <b>non paghi nulla</b>. Attenzione: è una soglia "tutto o niente", superarla fa pagare l'aliquota sull'intero imponibile.`
+          : r.addizionali.comunale === 0
+          ? `L'IRPEF netta è a zero, e senza IRPEF non si pagano le addizionali: quest'anno la voce vale <b>0,00 €</b>.`
           : (r.addizionali.dettaglioComunale
               ? `${state.comuneNome} usa scaglioni propri (dall'elenco ufficiale AdE), sempre sull'imponibile:` + scaglioniTable(r.addizionali.dettaglioComunale)
               : `${state.comuneNome} applica un'aliquota unica sull'imponibile:<br>${fmtEur(R, 2)} × ${fmtPct(r.input.comuneAliquota)} = <b>${fmtEur(r.addizionali.comunale, 2)}</b>`)),
@@ -583,9 +620,27 @@
     $('#breakdown-rows').innerHTML = html;
     document.querySelector('#breakdown-rows .v-row:last-child').classList.add('is-total');
 
+    // La pillola apprendistato dice il vantaggio in euro veri: stesso motore,
+    // stesso profilo, contributi ordinari, e si mostra la differenza
+    let pillaApprendistato = '';
+    if (r.contributi.apprendistato) {
+      const ordinario = calcolaNetto({
+        apprendistato: false,
+        provinciaTAA: state.provinciaTAA,
+        ral: state.ral,
+        mensilita: state.mensilita,
+        regioneId: state.regioneId,
+        comuneAliquota: state.comuneAliquota,
+        comuneEsenzione: state.comuneEsenzione,
+        comuneScaglioni: state.comuneScaglioni,
+      });
+      const delta = r.nettoAnnuo - ordinario.nettoAnnuo;
+      pillaApprendistato = `
+      <span class="meta-pill pill-app">in apprendistato: <b>~${fmtEur(delta)}</b> in più l'anno</span>`;
+    }
     $('#meta-pills').innerHTML = `
       <span class="meta-pill">netto medio mensile su 12: <b>${fmtEur(r.nettoAnnuo / 12)}</b></span>
-      <span class="meta-pill">maturi <span class="tip" tabindex="0" data-tip="Trattamento di Fine Rapporto: l'azienda lo accantona ogni anno (6,91% della RAL) e lo incassi alla cessazione del contratto.">TFR</span> per <b>~${fmtEur(ral * 0.0691)}</b> ogni anno</span>`;
+      <span class="meta-pill">maturi <span class="tip" tabindex="0" data-tip="Trattamento di Fine Rapporto: l'azienda lo accantona ogni anno (6,91% della RAL) e lo incassi alla cessazione del contratto.">TFR</span> per <b>~${fmtEur(ral * 0.0691)}</b> ogni anno</span>` + pillaApprendistato;
 
     renderCalendar(r);
     buildReport(r);
@@ -625,7 +680,7 @@
 
       <h2>Dal lordo al netto</h2>
       <table>
-        ${riga('Contributi INPS a carico del lavoratore', '9,19% sulla RAL' + (r.contributi.aggiuntivo > 0 ? ' + 1% oltre la prima fascia' : ''), '− ' + fmtEur(r.contributi.totale, 2), 'minus')}
+        ${riga('Contributi INPS a carico del lavoratore', (r.contributi.apprendistato ? '5,84% sulla RAL (apprendistato)' : '9,19% sulla RAL') + (r.contributi.aggiuntivo > 0 ? ' + 1% oltre la prima fascia' : ''), '− ' + fmtEur(r.contributi.totale, 2), 'minus')}
         ${riga('Imponibile fiscale', 'RAL meno contributi: base di IRPEF e addizionali', fmtEur(r.imponibile, 2))}
         ${riga('IRPEF netta', `lorda ${fmtEur(r.irpef.lorda, 2)} − detrazione lavoro ${fmtEur(r.irpef.detrazioneLavoro, 2)}${r.irpef.ulterioreDetrazione > 0 ? ' − detrazione cuneo ' + fmtEur(r.irpef.ulterioreDetrazione, 2) : ''}`, '− ' + fmtEur(r.irpef.netta, 2), 'minus')}
         ${riga('Addizionale regionale', r.addizionali.regolaRegionale, '− ' + fmtEur(r.addizionali.regionale, 2), 'minus')}
@@ -687,14 +742,16 @@
   function renderHR(r) {
     const { calcolaCostoAzienda, AZIENDA_2026 } = window.JetNetto;
     const det = state.contratto === 'det';
-    const c = calcolaCostoAzienda(r.input.ral, { determinato: det });
+    const c = calcolaCostoAzienda(r.input.ral, { determinato: det, apprendistato: state.apprendistato });
     document.querySelectorAll('.hr-contract .seg button').forEach((b) =>
       b.setAttribute('aria-pressed', String((b.dataset.c === 'det') === det)));
-    $('#hr-contract-hint').textContent = det
-      ? "Stai pagando l'1,4% in più di contributi: è il contributo addizionale che finanzia la NASpI. E gli incentivi durano 12 mesi invece di 18."
-      : "Il tempo determinato costerebbe l'1,4% in più di contributi (finanzia la NASpI) e dimezzerebbe la durata degli incentivi: 12 mesi invece di 18.";
+    $('#hr-contract-hint').textContent = c.apprendistato
+      ? "Con l'apprendistato il tipo di contratto non incide: niente contributo addizionale dell'1,4% (esclusione di legge)."
+      : det
+        ? "Stai pagando l'1,4% in più di contributi: è il contributo addizionale che finanzia la NASpI. E gli incentivi durano 12 mesi invece di 18."
+        : "Il tempo determinato costerebbe l'1,4% in più di contributi (finanzia la NASpI) e dimezzerebbe la durata degli incentivi: 12 mesi invece di 18.";
     $('#hr-totale').innerHTML = `${fmtEur(c.totale)}<small> /anno</small>`;
-    $('#hr-mensile').textContent = `circa ${fmtEur(c.totale / 12)} al mese, tutto compreso`;
+    $('#hr-mensile').innerHTML = `circa <b>${fmtEur(c.totale / 12)}</b> al mese, tutto compreso`;
     $('#hr-netto').innerHTML = `<span>di cui in tasca al dipendente</span>${fmtEur(r.nettoAnnuo)}`;
     $('#hr-extra-total').innerHTML = `+ ${fmtEur(c.totale - c.ral, 2)}`;
 
@@ -702,7 +759,11 @@
     // La lettura è una somma: si parte dalla RAL e ogni voce si AGGIUNGE al costo
     let html = '';
     html += rowHTML('Si parte dalla RAL pattuita', 'il lordo scritto nel contratto', c.ral, null, pct(c.ral));
-    html += rowHTML('Contributi INPS a carico azienda' + fn(3), `${fmtPct(AZIENDA_2026.inpsDatore)} della RAL: la parte di contributi che il dipendente non vede`, c.inps, 'add', pct(c.inps));
+    html += rowHTML('Contributi INPS a carico azienda' + (c.apprendistato ? fn(3, 12) : fn(3)),
+      c.apprendistato
+        ? `11,61% della RAL: l'aliquota ridotta dell'apprendistato (aziende con più di 9 dipendenti), contro il 23,81% ordinario`
+        : `${fmtPct(AZIENDA_2026.inpsDatore)} della RAL: la parte di contributi che il dipendente non vede`,
+      c.inps, 'add', pct(c.inps));
     if (c.addizionale > 0) {
       html += rowHTML('Contributo addizionale (determinato)' + fn(11), "1,4% della RAL: la maggiorazione dei contratti a termine, finanzia la NASpI", c.addizionale, 'add', pct(c.addizionale));
     }
@@ -758,7 +819,7 @@
       <h2>Dalla RAL al costo azienda</h2>
       <table>
         ${riga('RAL pattuita', null, fmtEur(c.ral, 2))}
-        ${riga('Contributi INPS a carico azienda', fmtPct(AZIENDA_2026.inpsDatore) + ' della RAL', '+ ' + fmtEur(c.inps, 2))}
+        ${riga('Contributi INPS a carico azienda', (c.apprendistato ? '11,61% della RAL (apprendistato)' : fmtPct(AZIENDA_2026.inpsDatore) + ' della RAL'), '+ ' + fmtEur(c.inps, 2))}
         ${c.addizionale > 0 ? riga('Contributo addizionale (determinato)', '1,4% della RAL, finanzia la NASpI', '+ ' + fmtEur(c.addizionale, 2)) : ''}
         ${riga('TFR accantonato', '6,91% della RAL, retribuzione differita', '+ ' + fmtEur(c.tfr, 2))}
         ${riga('INAIL (stima)', '~0,40%, mansioni impiegatizie', '+ ' + fmtEur(c.inail, 2))}
@@ -861,10 +922,32 @@
       $('#view-dip').hidden = vista !== 'dip';
       $('#view-hr').hidden = vista !== 'hr';
       $('#hr-contract').hidden = vista !== 'hr';
+      syncApprendistatoUI();
       updateResultTitle();
       if (vista === 'hr' && state.lastResult) renderHR(state.lastResult);
       if (state.lastResult) (vista === 'hr' ? buildReportHR : buildReport)(state.lastResult);
     };
+    // La stessa domanda cambia pelle con la vista: al dipendente diciamo
+    // cosa cambia in busta, all'azienda cosa cambia nel costo. E se e'
+    // apprendistato, il toggle del contratto si spegne: l'apprendistato
+    // e' esente per legge dall'1,4% del determinato.
+    function syncApprendistatoUI() {
+      const hr = state.vista === 'hr';
+      $('#apprendistato-label').textContent = hr ? 'È un apprendistato?' : 'Sono in apprendistato';
+      $('#apprendistato-row').querySelector('.tip').dataset.tip = hr
+        ? "Per un apprendista l'azienda versa l'11,61% di contributi invece del 23,81% (aziende con più di 9 dipendenti) e non paga l'1,4% del determinato. Il lavoratore versa il 5,84% e porta a casa di più."
+        : "In apprendistato versi il 5,84% di contributi invece del 9,19%: a parità di RAL il netto sale. E l'aliquota ridotta resta per un intero anno dopo la fine del periodo formativo.";
+      document.querySelectorAll('.hr-contract .seg button').forEach((b) => { b.disabled = state.apprendistato; });
+      if (hr && state.apprendistato) {
+        $('#hr-contract-hint').textContent = "Con l'apprendistato il tipo di contratto non incide: niente contributo addizionale dell'1,4% (esclusione di legge).";
+      }
+    }
+
+    $('#apprendistato-btn').addEventListener('click', () => {
+      state.apprendistato = !state.apprendistato;
+      $('#apprendistato-btn').setAttribute('aria-pressed', String(state.apprendistato));
+      syncApprendistatoUI();
+    });
     $('#vs-dip').addEventListener('click', () => setVista('dip'));
     $('#vs-hr').addEventListener('click', () => setVista('hr'));
     $('#aud-dip').addEventListener('click', () => setVista('dip'));
@@ -889,6 +972,8 @@
   function calculate() {
     if (!validateRal(true)) return;
     const r = calcolaNetto({
+      apprendistato: state.apprendistato,
+      provinciaTAA: state.provinciaTAA,
       ral: state.ral,
       mensilita: state.mensilita,
       regioneId: state.regioneId,
@@ -966,6 +1051,10 @@
       if ([12, 13, 14].includes(qM)) {
         state.mensilita = qM;
         document.querySelectorAll('.mensilita .seg button').forEach((x) => x.setAttribute('aria-pressed', String(Number(x.dataset.m) === qM)));
+      }
+      if (q.get('apprendistato') === '1') {
+        state.apprendistato = true;
+        $('#apprendistato-btn').setAttribute('aria-pressed', 'true');
       }
       state.ral = qRal;
       $('#ral-input').value = qRal.toLocaleString('it-IT');

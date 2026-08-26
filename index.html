@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Wix+Madefor+Display:wght@400;700;800&family=Wix+Madefor+Text:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=30">
+  <link rel="stylesheet" href="styles.css?v=31">
 </head>
 <body>
 <div class="wrap">
@@ -125,6 +125,10 @@
         </div>
         <p class="field-hint">La maggior parte dei CCNL impiegatizi prevede 13 mensilità: la tredicesima arriva a dicembre. La quattordicesima, dove il CCNL la prevede, tra giugno e luglio.</p>
       </div>
+      <div class="apprendistato" id="apprendistato-row">
+        <button type="button" id="apprendistato-btn" class="check-pill" aria-pressed="false"><span class="cp-box" aria-hidden="true"></span><span id="apprendistato-label">Sono in apprendistato</span></button>
+        <span class="tip" tabindex="0" data-tip="In apprendistato versi il 5,84% di contributi invece del 9,19%: a parità di RAL il netto sale. E l'aliquota ridotta resta per un intero anno dopo la fine del periodo formativo.">cosa cambia</span>
+      </div>
       <div class="hr-contract" id="hr-contract" hidden>
         <p class="m-label" id="hr-contract-label" style="font-weight:600;font-size:0.85rem;margin:0 0 8px">Che contratto offri?</p>
         <div class="seg" role="group" aria-labelledby="hr-contract-label">
@@ -162,6 +166,7 @@
       </div>
       <div class="rh-side">
         <div id="rh-annuo">—<span>netto annuo</span></div>
+        <div class="rh-quota" id="rh-quota"></div>
       </div>
     </div>
 
@@ -251,7 +256,7 @@
       <summary>Le logiche del calcolo, in sette passaggi</summary>
       <ul>
         <li><b>1. RAL</b> → si parte dal lordo annuo del contratto, con dentro già tutte le mensilità aggiuntive (tredicesima ed eventuale quattordicesima).</li>
-        <li><b>2. Contributi INPS</b> → il 9,19% della RAL va alla previdenza (più 1% sulla parte oltre 56.224 €). Si calcolano sulla RAL, non sul netto.</li>
+        <li><b>2. Contributi INPS</b> → il 9,19% della RAL va alla previdenza (più 1% sulla parte oltre 56.224 €); in apprendistato la quota scende al 5,84%, anche per l'anno successivo alla conferma. Si calcolano sulla RAL, non sul netto.</li>
         <li><b>3. Imponibile fiscale</b> → l'IRPEF non si paga sulla RAL: si paga su RAL meno contributi. È il concetto più frainteso di tutta la busta paga.</li>
         <li><b>4. IRPEF a scaglioni</b> → il reddito si tassa "a fette": 23% fino a 28.000, 33% fino a 50.000, 43% oltre. Salire di scaglione non riduce mai il netto.</li>
         <li><b>5. Detrazioni</b> → si sottraggono dall'imposta, non dal reddito. La detrazione da lavoro dipendente decresce col reddito e sparisce a 50.000 €.</li>
@@ -266,7 +271,7 @@
         <li><b>Nessun carico familiare né agevolazione</b> → è l'assunzione dichiarata del caso standard: le detrazioni per familiari si innesterebbero nello stesso punto della catena delle altre detrazioni, ma richiederebbero domande in più (coniuge, figli, età) per una platea che l'Assegno Unico ha molto ridotto.</li>
         <li><b>Part time senza campo dedicato</b> → svilupparlo non cambierebbe nulla: il calcolo è lineare nella RAL, chi è part time inserisce la sua RAL effettiva e ottiene il risultato corretto.</li>
         <li><b>Addizionali per competenza</b> → in busta reale arrivano l'anno dopo con saldo e acconto: modellare il meccanismo raddoppierebbe la complessità senza cambiare il totale che paghi.</li>
-        <li><b>Addizionali regionali: le 20 strutture vere</b> → ogni regione segue la sua pagina MEF 2026: scaglioni progressivi dove ci sono, fasce sull'intero imponibile (Friuli-VG, Valle d'Aosta con esenzione fino a 15.000), aliquote ridotte sotto soglia con detrazioni di fascia (Lazio −60 €, Umbria −150 €). Non modellate: le agevolazioni familiari regionali e le misure provinciali di Trento (deduzione 30.000) e Bolzano (detrazione 430,50), perché la mappa non distingue le due province.</li>
+        <li><b>Addizionali regionali: le 20 strutture vere</b> → ogni regione segue la sua pagina MEF 2026: scaglioni progressivi dove ci sono, fasce sull'intero imponibile (Friuli-VG, Valle d'Aosta con esenzione fino a 15.000), aliquote ridotte sotto soglia con detrazioni di fascia (Lazio −60 €, Umbria −150 €). In Trentino-Alto Adige la provincia si deduce dal comune scelto: Trento azzera l'addizionale fino a 30.000 € di imponibile con la sua deduzione, Bolzano applica una detrazione di 430,50 € fino a 90.000. Non modellate: le agevolazioni familiari regionali e l'ulteriore detrazione di Bolzano oltre 50.000 €.</li>
         <li><b>TFR fuori dal netto</b> → è retribuzione differita: non passa dalla busta, quindi mostrarlo nel netto sarebbe un errore. Lo mostriamo come maturazione annua.</li>
         <li><b>Trattamento integrativo semplificato</b> → la verifica di capienza completa considera anche altre detrazioni (familiari, mutuo) che il wizard non chiede: con il caso standard il risultato coincide.</li>
         <li><b>Vista azienda con stime</b> → l'INAIL esatto dipende dal codice tariffa della mansione e i fondi di categoria dal CCNL: dati non disponibili in forma aperta, usiamo i valori tipici da ufficio dichiarandoli.</li>
@@ -289,6 +294,7 @@
         <li id="fonte-9"><a href="https://www.comune.roma.it/web/it/scheda-servizi.page?contentId=INF41403" target="_blank" rel="noopener">Roma Capitale, addizionale IRPEF</a>: aliquota 0,90%, esenzione 14.000 € dal 2025.</li>
         <li id="fonte-10"><a href="https://www.agenziaentrate.gov.it/portale/documents/d/guest/elenco-annuale-addizionale-comunale-modulistica-2026_def" target="_blank" rel="noopener">Agenzia delle Entrate, elenco annuale delle aliquote di addizionale comunale (modulistica 2026)</a>: aliquote, scaglioni e soglie di esenzione di ogni comune, riferite al saldo 2025 e all'acconto 2026. È la fonte dei dati comunali del calcolatore; i casi particolari agevolativi (colonna Tipizzazione) non sono modellati.</li>
         <li id="fonte-11"><a href="https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:2012-06-28;92~art4" target="_blank" rel="noopener">L. 92/2012 (riforma Fornero), Normattiva</a>: incentivi strutturali all'assunzione: art. 4 commi 8-11 (over 50 e donne svantaggiate, 50% dei contributi datoriali), art. 2 comma 10-bis (percettori NASpI, 20% dell'indennità residua).</li>
+        <li id="fonte-12"><a href="https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:2006-12-27;296~art1" target="_blank" rel="noopener">L. 296/2006, art. 1 comma 773, Normattiva</a>: la contribuzione degli apprendisti: 5,84% a carico del lavoratore (che resta per un anno dopo la conferma) e aliquota datoriale del 10%, cui dal 2013 si aggiunge l'1,61% NASpI; gli apprendisti sono esclusi dal contributo addizionale del determinato (L. 92/2012, art. 2 c. 29).</li>
       </ol>
       </details>
     </div>
@@ -321,6 +327,6 @@
 <script src="italy-map.js?v=2"></script>
 <script src="comuni.js?v=2"></script>
 <script src="engine.js?v=3"></script>
-<script src="app.js?v=24"></script>
+<script src="app.js?v=25"></script>
 </body>
 </html>

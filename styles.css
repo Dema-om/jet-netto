@@ -122,6 +122,7 @@ body {
   content: attr(data-tip);
   position: absolute; left: 0; bottom: calc(100% + 8px);
   width: 230px; padding: 10px 12px;
+  text-align: left; /* il genitore può essere allineato a destra: il tooltip si legge sempre da sinistra */
   white-space: normal; /* il genitore può avere nowrap (etichette): il tooltip va sempre a capo */
   background: var(--ink); color: #fff;
   font-size: 0.8rem; line-height: 1.45; font-weight: 400;
@@ -272,6 +273,7 @@ body {
 .result-hero .rh-side span { display: block; color: #b9bfae; font-size: 0.8rem; font-weight: 400; font-family: var(--font-text); }
 
 .result-hero .rh-extra { color: #b9bfae; font-size: 0.9rem; margin-top: 8px; }
+.result-hero .rh-extra b { color: #fff; font-weight: 600; }
 .result-hero .rh-extra:empty { display: none; }
 
 .result-actions { margin-top: 18px; }
@@ -489,6 +491,45 @@ details.b-details th { color: var(--ink-muted); font-weight: 600; }
 .fonte-flash { animation: fonte-flash 2s ease; }
 /* FAB "torna alla voce": tondo, solo freccia, in basso a destra (zona pollice).
    Su desktop si allinea al bordo della colonna dei contenuti. */
+/* La quota qualifica il netto annuo: gli sta attaccata e ne eredita
+   l'allineamento (destra su desktop, sinistra quando il box si impila) */
+.result-hero .rh-side .rh-quota {
+  font-size: 0.72rem; font-weight: 400; color: #b9bfae;
+  margin-top: 4px; line-height: 1.4;
+}
+.result-hero .rh-side .rh-quota b { color: #fff; font-weight: 600; }
+.hr-contract .seg button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Il tooltip dell'esenzione sta sul bordo destro della card: si aggancia
+   a destra per non sbordare, come quello dell'apprendistato */
+#city-esenzione .tip::after { left: auto; right: 0; }
+
+/* Apprendistato: riga discreta sotto le mensilita', solo vista dipendente */
+.apprendistato { display: flex; align-items: center; gap: 12px; margin-top: 14px; }
+.check-pill {
+  display: inline-flex; align-items: center; gap: 9px;
+  font: inherit; font-size: 0.88rem; font-weight: 600; color: var(--ink);
+  background: none; border: none; cursor: pointer;
+  padding: 12px 4px; margin: -12px -4px; /* bersaglio 44px senza spostare il testo */
+}
+.cp-box {
+  width: 18px; height: 18px; flex: none; border-radius: 5px;
+  border: 2px solid var(--ink-muted); background: #fff;
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: background 150ms, border-color 150ms;
+}
+.check-pill[aria-pressed="true"] .cp-box { background: var(--ink); border-color: var(--ink); }
+.check-pill[aria-pressed="true"] .cp-box::after {
+  content: ''; width: 9px; height: 5px; margin-top: -2px;
+  border-left: 2.5px solid var(--lime); border-bottom: 2.5px solid var(--lime);
+  transform: rotate(-45deg);
+}
+.check-pill:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; border-radius: 8px; }
+.apprendistato .tip { font-size: 0.78rem; color: var(--ink-muted); }
+/* qui l'ancora sta a meta' riga: il tooltip si aggancia a destra per
+   restare nel viewport anche da telefono */
+.apprendistato .tip::after { left: auto; right: 0; }
+
 .back-pill {
   position: fixed;
   right: max(18px, calc((100vw - 880px) / 2 + 20px));

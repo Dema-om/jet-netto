@@ -25,6 +25,9 @@ const TAX_2026 = {
     aliquota: 0.0919,
     aliquotaAggiuntiva: 0.01,
     primaFascia: 56224, // € annui, 2026
+    // Apprendistato: aliquota a carico del lavoratore ridotta, che resta
+    // per un intero anno dopo la conferma a fine periodo formativo (INPS)
+    apprendista: 0.0584,
   },
 
   // Scaglioni IRPEF 2026 (Legge di Bilancio 2026, L. 199/2025):
@@ -214,13 +217,22 @@ const TAX_2026 = {
     },
     'trentino-south-tyrol': {
       nome: 'Trentino-Alto Adige', capoluogo: 'Trento',
-      // Parte comune alle due province; le agevolazioni provinciali
-      // (Trento: deduzione 30.000; Bolzano: detrazione 430,50) non sono
-      // modellate perche' la mappa non distingue le province
+      // Scaglioni comuni alle due province autonome; la provincia si deduce
+      // dal comune scelto e attiva la sua agevolazione (pagine MEF):
+      //  - Trento (L.P. 13/2019, mod. L.P. 11/2025): deduzione di 30.000
+      //    per gli imponibili fino a 30.000 -> addizionale azzerata
+      //  - Bolzano (L.P. 9/1998, art. 21/sexiesdecies): detrazione di
+      //    430,50 per gli imponibili fino a 90.000 (l'ulteriore detrazione
+      //    decrescente oltre 50.000 non e' modellata: formula non
+      //    pubblicata in modo univoco)
       scaglioni: [
         { fino: 50000, aliquota: 0.0123 },
         { fino: Infinity, aliquota: 0.0173 },
       ],
+      province: {
+        trento: { deduzioneFino: 30000 },
+        bolzano: { detrazione: 430.50, fino: 90000 },
+      },
     },
     umbria: {
       nome: 'Umbria', capoluogo: 'Perugia',
@@ -265,7 +277,25 @@ const TAX_2026 = {
  * aliquota unica, scaglioni progressivi, fasce sull'intero imponibile,
  * aliquota ridotta sotto soglia, detrazioni fisse di fascia.
  */
-function addizionaleRegionale(imponibile, regione) {
+function addizionaleRegionale(imponibile, regione, provinciaTAA) {
+  // Province autonome: l'agevolazione dipende dalla provincia del comune
+  if (regione.province && provinciaTAA && regione.province[provinciaTAA]) {
+    const prov = regione.province[provinciaTAA];
+    if (prov.deduzioneFino != null && imponibile <= prov.deduzioneFino) {
+      return { totale: 0, dettaglio: null, regola: 'azzerata dalla deduzione provinciale', detrazione: 0 };
+    }
+    if (prov.detrazione != null && imponibile <= prov.fino) {
+      const calc = perScaglioni(imponibile, regione.scaglioni);
+      return {
+        totale: Math.max(0, calc.totale - prov.detrazione),
+        dettaglio: calc.dettaglio,
+        regola: 'per scaglioni',
+        detrazione: prov.detrazione,
+        detrazioneNota: 'la detrazione provinciale di Bolzano',
+      };
+    }
+    // sopra le soglie provinciali valgono gli scaglioni pieni
+  }
   if (regione.fasceIntero) {
     const fascia = regione.fasceIntero.find((f) => imponibile <= f.fino);
     const totale = imponibile * fascia.aliquota;
@@ -293,7 +323,7 @@ function addizionaleRegionale(imponibile, regione) {
         if (imponibile > d.da && imponibile <= d.a) detrazione = d.importo;
       }
     }
-    return { totale: Math.max(0, calc.totale - detrazione), dettaglio: calc.dettaglio, regola: 'per scaglioni', detrazione };
+    return { totale: Math.max(0, calc.totale - detrazione), dettaglio: calc.dettaglio, regola: 'per scaglioni', detrazione, detrazioneNota: 'la detrazione regionale di fascia' };
   }
   return { totale: imponibile * regione.aliquota, dettaglio: null, regola: 'aliquota unica', detrazione: 0 };
 }
@@ -331,9 +361,14 @@ function calcolaNetto(p) {
   const regione = T.regioni[p.regioneId || 'lombardy'];
   if (!regione) throw new Error('Regione non riconosciuta: ' + p.regioneId);
 
-  // 1. Contributi INPS a carico del lavoratore (calcolati sulla RAL)
-  const inpsBase = ral * T.inps.aliquota;
-  const inpsAggiuntivo = Math.max(0, ral - T.inps.primaFascia) * T.inps.aliquotaAggiuntiva;
+  // 1. Contributi INPS a carico del lavoratore (calcolati sulla RAL).
+  // In apprendistato l'aliquota scende al 5,84%; il contributo aggiuntivo
+  // dell'1% oltre la prima fascia non e' modellato per gli apprendisti
+  // (caso non tipico del contratto, dichiarato).
+  const apprendistato = !!p.apprendistato;
+  const aliquotaInps = apprendistato ? T.inps.apprendista : T.inps.aliquota;
+  const inpsBase = ral * aliquotaInps;
+  const inpsAggiuntivo = apprendistato ? 0 : Math.max(0, ral - T.inps.primaFascia) * T.inps.aliquotaAggiuntiva;
   const contributi = inpsBase + inpsAggiuntivo;
 
   // 2. Imponibile fiscale (base per IRPEF e addizionali)
@@ -357,7 +392,7 @@ function calcolaNetto(p) {
   const irpefDovuta = irpefNetta > 0;
   const addRegionaleCalc = !irpefDovuta
     ? { totale: 0, dettaglio: null, regola: 'non dovuta', detrazione: 0 }
-    : addizionaleRegionale(imponibile, regione);
+    : addizionaleRegionale(imponibile, regione, p.provinciaTAA);
   const addRegionale = addRegionaleCalc.totale;
 
   const comAliquota = p.comuneAliquota ?? T.comuneDefault.aliquota;
@@ -394,7 +429,7 @@ function calcolaNetto(p) {
   return {
     input: { ral, mensilita, regione: regione.nome, comuneAliquota: comAliquota, comuneEsenzione: comEsenzione },
     mensilitaDetail: { ordinario: nettoOrdinario, extra: nettoExtra, extraCount },
-    contributi: { totale: contributi, base: inpsBase, aggiuntivo: inpsAggiuntivo },
+    contributi: { totale: contributi, base: inpsBase, aggiuntivo: inpsAggiuntivo, aliquota: aliquotaInps, apprendistato },
     imponibile,
     irpef: {
       lorda: irpefLorda,
@@ -403,7 +438,7 @@ function calcolaNetto(p) {
       ulterioreDetrazione,
       netta: irpefNetta,
     },
-    addizionali: { regionale: addRegionale, dettaglioRegionale: addRegionaleCalc.dettaglio, regolaRegionale: addRegionaleCalc.regola, detrazioneRegionale: addRegionaleCalc.detrazione, comunale: addComunale, dettaglioComunale: comCalc.dettaglio },
+    addizionali: { regionale: addRegionale, dettaglioRegionale: addRegionaleCalc.dettaglio, regolaRegionale: addRegionaleCalc.regola, detrazioneRegionale: addRegionaleCalc.detrazione, detrazioneRegionaleNota: addRegionaleCalc.detrazioneNota || null, comunale: addComunale, dettaglioComunale: comCalc.dettaglio },
     bonus: { sommaEsente, trattamentoIntegrativo: trattIntegrativo },
     totaleTrattenute,
     nettoAnnuo,
@@ -419,16 +454,27 @@ function calcolaNetto(p) {
 // dello 0,50% al fondo di garanzia), INAIL ~0,40% (rischio ufficio).
 // Il contratto a termine paga anche il contributo addizionale dell'1,4%
 // (art. 2, c. 28, L. 92/2012: finanzia la NASpI).
-const AZIENDA_2026 = { inpsDatore: 0.2381, tfr: 0.0691, inail: 0.004, addizionaleDeterminato: 0.014 };
+const AZIENDA_2026 = {
+  inpsDatore: 0.2381,
+  // Apprendistato, aziende con piu' di 9 dipendenti: 10% previdenziale
+  // + 1,61% NASpI e fondi (L. 296/2006 art. 1 c. 773; NASpI dal 2013)
+  inpsDatoreApprendista: 0.1161,
+  tfr: 0.0691,
+  inail: 0.004,
+  addizionaleDeterminato: 0.014,
+};
 
 /** Costo azienda: quanto spende il datore per una data RAL. */
 function calcolaCostoAzienda(ral, opts = {}) {
-  const determinato = Boolean(opts.determinato);
-  const inps = ral * AZIENDA_2026.inpsDatore;
+  const apprendistato = Boolean(opts.apprendistato);
+  const determinato = Boolean(opts.determinato) && !apprendistato;
+  const inps = ral * (apprendistato ? AZIENDA_2026.inpsDatoreApprendista : AZIENDA_2026.inpsDatore);
+  // Gli apprendisti sono esclusi dal contributo addizionale del determinato
+  // (art. 2 c. 29 L. 92/2012)
   const addizionale = determinato ? ral * AZIENDA_2026.addizionaleDeterminato : 0;
   const tfr = ral * AZIENDA_2026.tfr;
   const inail = ral * AZIENDA_2026.inail;
-  return { ral, inps, addizionale, tfr, inail, determinato, totale: ral + inps + addizionale + tfr + inail };
+  return { ral, inps, addizionale, tfr, inail, determinato, apprendistato, totale: ral + inps + addizionale + tfr + inail };
 }
 
 // Incentivi STRUTTURALI all'assunzione (L. 92/2012): non a bando, sempre

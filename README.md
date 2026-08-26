@@ -14,7 +14,7 @@ controllo delle logiche. Il prototipo lo prende alla lettera su quattro piani:
 
 1. **Il motore è separato dalla UI.** Tutta la fiscalità sta in `engine.js`,
    una funzione pura senza dipendenze che gira identica nel browser e in Node.
-   Si testa da terminale: `node engine.test.js` (71 assert su formule, casi
+   Si testa da terminale: `node engine.test.js` (85 assert su formule, casi
    completi verificati a mano, monotonia del netto, ripartizione delle
    mensilità, dati dei comuni, costo azienda, incentivi e robustezza input). L'audit finale ha
    passato al setaccio 8.000 combinazioni regione × RAL senza anomalie e
@@ -41,7 +41,7 @@ controllo delle logiche. Il prototipo lo prende alla lettera su quattro piani:
 | # | Passaggio | Regola |
 |---|-----------|--------|
 | 1 | RAL | lordo annuo da contratto, mensilità aggiuntive già incluse (13ª ed eventuale 14ª) |
-| 2 | Contributi INPS | 9,19% sulla RAL + 1% sulla parte oltre 56.224 € (prima fascia pensionabile) |
+| 2 | Contributi INPS | 9,19% sulla RAL + 1% sulla parte oltre 56.224 € (prima fascia pensionabile); in apprendistato 5,84%, valido anche per l'anno successivo alla conferma |
 | 3 | Imponibile fiscale | RAL − contributi. È la base di IRPEF e addizionali |
 | 4 | IRPEF lorda | a scaglioni: 23% fino a 28.000, 33% fino a 50.000, 43% oltre |
 | 5 | Detrazione lavoro dipendente | art. 13 TUIR, decresce col reddito, si azzera a 50.000 € (+65 € tra 25.000 e 35.000) |
@@ -158,11 +158,21 @@ payroll, dove la compliance è il mestiere. Il flusso di produzione sarebbe:
   norma le prevede (Friuli-VG 0,70/1,23; Valle d'Aosta esente fino a
   15.000), aliquote ridotte sotto soglia con detrazioni di fascia (Lazio
   1,73% fino a 28.000 poi scaglioni con −60 €; Umbria 1,23% fino a 28.000
-  poi scaglioni con −150 €). Non modellate, e dichiarate: le agevolazioni
-  familiari regionali e le misure provinciali di Trento (deduzione 30.000)
-  e Bolzano (detrazione 430,50), perché la mappa non distingue le province.
+  poi scaglioni con −150 €). In Trentino-Alto Adige la provincia si deduce
+  dal comune scelto (incrocio con l'elenco ISTAT, 166+116 comuni): Trento
+  azzera l'addizionale fino a 30.000 € di imponibile con la sua deduzione,
+  Bolzano applica una detrazione di 430,50 € fino a 90.000. Non modellate,
+  e dichiarate: le agevolazioni familiari regionali e l'ulteriore
+  detrazione di Bolzano oltre 50.000 € (formula non pubblicata in modo
+  univoco dal MEF).
 - Le addizionali seguono la condizione di debenza: sotto la no-tax area, dove
   l'IRPEF si azzera, non sono dovute (art. 50 D.Lgs. 446/1997).
+- Apprendistato: lato lavoratore il 5,84% al posto del 9,19% (senza il
+  contributo aggiuntivo dell'1%, caso non tipico del contratto); lato
+  azienda l'11,61% delle imprese con più di 9 dipendenti (per le più
+  piccole esistono aliquote ancora ridotte nei primi anni, non modellate)
+  e l'esclusione di legge dal contributo addizionale del determinato
+  (art. 2 c. 29 L. 92/2012).
 - Comuni: aliquote, scaglioni e soglie di esenzione REALI per 7.871 dei
   7.904 comuni, importate dall'elenco annuale ufficiale dell'Agenzia delle Entrate
   (modulistica 2026, riferito a saldo 2025 / acconto 2026) e unite all'elenco
