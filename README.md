@@ -247,6 +247,17 @@ Le scelte minute d'interfaccia sono ragionate quanto quelle fiscali:
   trattato da telefono: feedback al tocco disegnati dal sito (niente flash
   grigio di sistema) e tastiera che non si impone: non si apre da sola e si
   chiude scegliendo un importo preimpostato.
+- **La provincia autonoma non si chiede, si capisce**: in Trentino-Alto
+  Adige le agevolazioni sono provinciali (Trento azzera l'addizionale fino
+  a 30.000 € di imponibile, Bolzano detrae 430,50 €), ma nessun campo in
+  più: scegli il tuo comune e il motore deduce la provincia dall'elenco
+  ISTAT. Una regola fiscale vera in meno da conoscere, una domanda in
+  meno da fare.
+- **L'apprendistato parla a entrambe le facce**: la stessa casella cambia
+  pelle con la vista: al dipendente dice che versa il 5,84% invece del
+  9,19% (e che l'aliquota ridotta resta per un anno dopo la conferma),
+  all'azienda che versa l'11,61% invece del 23,81% ed è esente dall'1,4%
+  del determinato. Un solo interruttore, due verità complementari.
 - **Trovabilità curata (SEO e GEO)**: titolo brand-first ("Jet Netto |
   dalla RAL al netto 2026"), Open Graph per le anteprime nelle chat e sui
   social, canonical e scheda JSON-LD (WebApplication): la SEO parla ai

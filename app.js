@@ -666,7 +666,7 @@
         </div>
         <div class="side">
           <b>${fmtEur(r.nettoAnnuo)}</b> netto annuo
-          <b style="margin-top:6px">${fmtEur(r.totaleTrattenute)}</b> trattenute totali
+          <b style="margin-top:6px">${fmtEur(r.totaleTrattenute)}</b> trattenute totali${r.input.ral > 0 ? ` · il ${((1 - r.nettoAnnuo / r.input.ral) * 100).toLocaleString('it-IT', { maximumFractionDigits: 1 })}% della RAL` : ''}
         </div>
       </div>
 
@@ -674,7 +674,7 @@
       <table>
         ${riga('Retribuzione annua lorda', null, fmtEur(r.input.ral))}
         ${riga('Residenza', null, `${r.input.regione}`)}
-        ${riga('Addizionale comunale', r.input.comuneEsenzione > 0 ? `esenzione fino a ${fmtEur(r.input.comuneEsenzione)}` : null, r.addizionali.dettaglioComunale ? 'a scaglioni (elenco AdE)' : fmtPct(r.input.comuneAliquota))}
+        ${riga('Addizionale comunale', r.input.comuneEsenzione > 0 ? `esenzione fino a ${fmtEur(r.input.comuneEsenzione)}` : null, r.addizionali.dettaglioComunale ? 'a scaglioni (elenco AdE)' : comuneNonPrevista(r) ? 'non prevista dal comune' : fmtPct(r.input.comuneAliquota))}
         ${riga('Mensilità', null, String(r.input.mensilita))}
       </table>
 
@@ -683,8 +683,8 @@
         ${riga('Contributi INPS a carico del lavoratore', (r.contributi.apprendistato ? '5,84% sulla RAL (apprendistato)' : '9,19% sulla RAL') + (r.contributi.aggiuntivo > 0 ? ' + 1% oltre la prima fascia' : ''), '− ' + fmtEur(r.contributi.totale, 2), 'minus')}
         ${riga('Imponibile fiscale', 'RAL meno contributi: base di IRPEF e addizionali', fmtEur(r.imponibile, 2))}
         ${riga('IRPEF netta', `lorda ${fmtEur(r.irpef.lorda, 2)} − detrazione lavoro ${fmtEur(r.irpef.detrazioneLavoro, 2)}${r.irpef.ulterioreDetrazione > 0 ? ' − detrazione cuneo ' + fmtEur(r.irpef.ulterioreDetrazione, 2) : ''}`, '− ' + fmtEur(r.irpef.netta, 2), 'minus')}
-        ${riga('Addizionale regionale', r.addizionali.regolaRegionale, '− ' + fmtEur(r.addizionali.regionale, 2), 'minus')}
-        ${riga('Addizionale comunale', r.addizionali.comunale === 0 && r.input.comuneEsenzione > 0 ? 'esente sotto soglia' : (r.addizionali.dettaglioComunale ? 'per scaglioni comunali, elenco AdE' : null), '− ' + fmtEur(r.addizionali.comunale, 2), 'minus')}
+        ${riga('Addizionale regionale', r.addizionali.regolaRegionale + (r.addizionali.detrazioneRegionale > 0 ? `, con detrazione di ${fmtEur(r.addizionali.detrazioneRegionale, 2)}` : ''), '− ' + fmtEur(r.addizionali.regionale, 2), 'minus')}
+        ${riga('Addizionale comunale', comuneNonPrevista(r) ? 'non prevista dal comune' : r.addizionali.comunale === 0 && r.input.comuneEsenzione > 0 && r.imponibile <= r.input.comuneEsenzione ? 'esente sotto soglia' : r.addizionali.comunale === 0 ? 'non dovuta: IRPEF a zero' : (r.addizionali.dettaglioComunale ? 'per scaglioni comunali, elenco AdE' : null), '− ' + fmtEur(r.addizionali.comunale, 2), 'minus')}
         ${r.bonus.sommaEsente > 0 ? riga('Somma esente taglio del cuneo', 'si aggiunge al netto', '+ ' + fmtEur(r.bonus.sommaEsente, 2), 'plus') : ''}
         ${r.bonus.trattamentoIntegrativo > 0 ? riga('Trattamento integrativo', 'si aggiunge al netto', '+ ' + fmtEur(r.bonus.trattamentoIntegrativo, 2), 'plus') : ''}
         ${riga('Netto annuo', null, fmtEur(r.nettoAnnuo, 2), 'total')}
@@ -780,7 +780,7 @@
   function buildReportHR(r) {
     const { calcolaCostoAzienda, calcolaSgravio, AZIENDA_2026 } = window.JetNetto;
     const det = state.contratto === 'det';
-    const c = calcolaCostoAzienda(r.input.ral, { determinato: det });
+    const c = calcolaCostoAzienda(r.input.ral, { determinato: det, apprendistato: state.apprendistato });
     const oggi = new Date().toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' });
     const riga = (nome, sub, val, cls) =>
       `<tr class="${cls || ''}"><td>${nome}${sub ? `<span class="sub">${sub}</span>` : ''}</td><td>${val}</td></tr>`;
@@ -810,7 +810,7 @@
       <h2>La proposta</h2>
       <table>
         ${riga('RAL offerta', null, fmtEur(r.input.ral))}
-        ${riga('Contratto', null, det ? 'Tempo determinato' : 'Tempo indeterminato')}
+        ${riga('Contratto', c.apprendistato ? 'aliquota datoriale ridotta, esente dal contributo addizionale' : null, c.apprendistato ? 'Apprendistato' : det ? 'Tempo determinato' : 'Tempo indeterminato')}
         ${riga('Residenza del dipendente', 'determina le sue addizionali, non il costo azienda', r.input.regione)}
         ${riga('Mensilità', null, String(r.input.mensilita))}
         ${riga('Netto mensile percepito', 'la cifra che pesa nella trattativa', fmtEur(r.mensilitaDetail.ordinario) + ' × 12' + (r.mensilitaDetail.extraCount ? ` + ${fmtEur(r.mensilitaDetail.extra)} × ${r.mensilitaDetail.extraCount}` : ''))}
