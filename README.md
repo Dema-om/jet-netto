@@ -217,8 +217,10 @@ Le scelte minute d'interfaccia sono ragionate quanto quelle fiscali:
   nulla.
 - **Mobile first sul serio**: layout verificato a 375px senza scroll
   orizzontale, avanzamento ridotto ai soli pallini sugli schermi stretti,
-  campi in colonna dove le etichette andrebbero a capo, target tattili
-  da 44px.
+  campi in colonna dove le etichette andrebbero a capo. I bersagli tattili
+  seguono, oltre agli standard WCAG, le Apple Human Interface Guidelines:
+  44px effettivi anche dove il disegno è più piccolo (pallini, logo, chip),
+  estendendo l'area toccabile senza toccare l'estetica.
 
 Le stesse scelte, con più contesto, sono nella pagina
 [credits](https://jetnetto.zetakiwi.com/credits.html) del sito.
