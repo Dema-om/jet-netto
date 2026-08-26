@@ -202,13 +202,18 @@ payroll, dove la compliance è il mestiere. Il flusso di produzione sarebbe:
 - Detrazione lavoro dipendente: art. 13 TUIR (DPR 917/1986).
 - Taglio del cuneo (somma esente + ulteriore detrazione) e trattamento
   integrativo: L. 207/2024, art. 1.
-- Addizionale regionale: scaglioni Lombardia e aliquote regionali 2026 dalle
-  delibere vigenti (MEF, fiscalità locale).
+- Addizionali regionali: le 20 pagine regionali del MEF (fiscalità locale),
+  verificate una per una: scaglioni, fasce sull'intero imponibile, riduzioni
+  sotto soglia e detrazioni di fascia, comprese le misure delle province
+  autonome di Trento e Bolzano.
 - Addizionali comunali: elenco annuale ufficiale dell'Agenzia delle Entrate
   (modulistica 2026) per tutti i comuni; verifiche puntuali su Comune di
   Milano (0,80%, esenzione 23.000 €) e Roma Capitale (0,90%, esenzione
   14.000 €).
 - Incentivi all'assunzione: L. 92/2012 (art. 4 e art. 2 c. 10-bis).
+- Contribuzione apprendisti: L. 296/2006, art. 1 c. 773 (5,84% lavoratore,
+  10% + 1,61% NASpI datore); esclusione dal contributo addizionale del
+  determinato: L. 92/2012, art. 2 c. 29.
 
 ## I dettagli di UX
 

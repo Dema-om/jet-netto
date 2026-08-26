@@ -485,7 +485,7 @@ const SGRAVI_2026 = {
     nome: 'Over 50 disoccupato da almeno 12 mesi',
     tipo: 'contributi', quota: 0.5, mesi: 18,
     fonte: 'L. 92/2012, art. 4, commi 8-10',
-    descr: 'Riduzione del 50% dei contributi a carico del datore per 18 mesi (assunzione a tempo indeterminato).',
+    descr: 'Riduzione del 50% dei contributi a carico del datore per 18 mesi: disoccupati da almeno dodici mesi con più di 50 anni.',
   },
   donna: {
     nome: 'Donna "svantaggiata"',

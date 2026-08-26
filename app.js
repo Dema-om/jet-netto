@@ -869,7 +869,7 @@
       <div class="sgravio-box">
         <div class="in-label">${s.nome}${fn(11)}</div>
         <div class="in-value">risparmi ${fmtEur(s.mensile)} al mese</div>
-        <div class="in-sub">${s.descr}</div>
+        <div class="in-sub">${s.descr.replace('per 18 mesi', `per ${s.durataMesi} mesi`)}</div>
         <div class="sgravio-nums">
           <span class="meta-pill">primo anno <b>${fmtEur(s.primoAnno)}</b></span>
           <span class="meta-pill">totale su ${s.durataMesi} mesi <b>${fmtEur(s.totale)}</b></span>
