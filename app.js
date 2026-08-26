@@ -757,7 +757,7 @@
       s2t: 'Il tuo <mark>comune</mark>',
       s2l: 'Ogni comune delibera la propria addizionale. Cerca il tuo: l\'elenco mostra solo i comuni della regione che hai scelto.',
       s3t: 'La tua <mark>RAL</mark>',
-      s3l: 'La retribuzione annua lorda che trovi nel contratto o nella lettera di offerta, tredicesima inclusa.',
+      s3l: 'La retribuzione annua lorda che trovi nel contratto o nella lettera di offerta: include già tredicesima e, se il tuo CCNL la prevede, quattordicesima.',
     },
     hr: {
       s1t: 'Dove è <mark>residente</mark> chi assumi?',
@@ -765,7 +765,7 @@
       s2t: 'Il <mark>suo</mark> comune',
       s2l: 'Ogni comune delibera la propria addizionale. Cerca il comune di residenza della persona che vuoi assumere.',
       s3t: 'La RAL che <mark>offri</mark>',
-      s3l: 'La retribuzione annua lorda che metti nell\'offerta, tredicesima inclusa.',
+      s3l: 'La retribuzione annua lorda che metti nell\'offerta: include già tredicesima e, se il CCNL la prevede, quattordicesima.',
     },
   };
 

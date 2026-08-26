@@ -39,7 +39,7 @@ controllo delle logiche. Il prototipo lo prende alla lettera su quattro piani:
 
 | # | Passaggio | Regola |
 |---|-----------|--------|
-| 1 | RAL | lordo annuo da contratto, tredicesima inclusa |
+| 1 | RAL | lordo annuo da contratto, mensilità aggiuntive già incluse (13ª ed eventuale 14ª) |
 | 2 | Contributi INPS | 9,19% sulla RAL + 1% sulla parte oltre 56.224 € (prima fascia pensionabile) |
 | 3 | Imponibile fiscale | RAL − contributi. È la base di IRPEF e addizionali |
 | 4 | IRPEF lorda | a scaglioni: 23% fino a 28.000, 33% fino a 50.000, 43% oltre |
