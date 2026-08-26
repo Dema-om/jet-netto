@@ -219,10 +219,9 @@ body {
 .mensilita .m-label { font-size: 0.85rem; font-weight: 600; color: var(--ink-soft); margin-bottom: 8px; }
 .seg { display: inline-flex; border: 1.5px solid var(--border-strong); border-radius: 12px; overflow: hidden; background: #fff; }
 .seg button {
-  border: none; background: none; font: inherit; padding: 9px 20px; cursor: pointer; color: var(--ink-soft);
-  position: relative;
+  /* 10px di padding portano l'altezza reale a 44px (Apple HIG) senza cambi percepibili */
+  border: none; background: none; font: inherit; padding: 10px 20px; cursor: pointer; color: var(--ink-soft);
 }
-.seg button::after { content: ""; position: absolute; inset: -4px 0; } /* bersaglio tattile pieno in altezza */
 .seg button + button { border-left: 1.5px solid var(--border-strong); }
 .seg button[aria-pressed="true"] { background: var(--ink); color: var(--lime); font-weight: 700; }
 .seg button:focus-visible { outline: 2px solid var(--ink); outline-offset: -3px; }
