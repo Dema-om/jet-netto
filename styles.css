@@ -487,22 +487,27 @@ details.b-details th { color: var(--ink-muted); font-weight: 600; }
 
 .fonti li.fonte-flash { animation: fonte-flash 2s ease; border-radius: 6px; }
 .fonte-flash { animation: fonte-flash 2s ease; }
+/* FAB "torna alla voce": tondo, solo freccia, in basso a destra (zona pollice).
+   Su desktop si allinea al bordo della colonna dei contenuti. */
 .back-pill {
-  position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px));
-  transform: translateX(-50%) translateY(90px); opacity: 0;
+  position: fixed;
+  right: max(18px, calc((100vw - 880px) / 2 + 20px));
+  bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+  width: 52px; height: 52px; border-radius: 50%;
+  transform: translateY(90px); opacity: 0;
   transition: transform 220ms ease, opacity 220ms ease;
   z-index: 60; pointer-events: none;
-  display: inline-flex; align-items: center; gap: 9px;
-  background: var(--lime); color: var(--ink);
-  border: 1.5px solid var(--ink); border-radius: 999px;
-  padding: 12px 22px; font-family: var(--font-display); font-weight: 700; font-size: 0.95rem;
-  box-shadow: 0 6px 24px rgba(17, 21, 10, 0.22);
+  display: grid; place-items: center;
+  background: var(--lime);
+  border: 1.5px solid var(--ink);
+  box-shadow: 0 6px 24px rgba(17, 21, 10, 0.25);
   cursor: pointer;
 }
-.back-pill.is-visible { transform: translateX(-50%) translateY(0); opacity: 1; pointer-events: auto; }
+.back-pill.is-visible { transform: translateY(0); opacity: 1; pointer-events: auto; }
+.back-pill:hover { transform: translateY(-2px); }
 .back-pill .bp-chevron {
-  width: 8px; height: 8px; margin-top: 3px;
-  border-left: 2.5px solid var(--ink); border-top: 2.5px solid var(--ink);
+  width: 12px; height: 12px; margin-top: 5px;
+  border-left: 3px solid var(--ink); border-top: 3px solid var(--ink);
   transform: rotate(45deg);
 }
 .back-pill:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }

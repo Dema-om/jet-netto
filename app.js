@@ -416,7 +416,8 @@
     if (!pillola) {
       pillola = document.createElement('button');
       pillola.className = 'back-pill';
-      pillola.innerHTML = '<span class="bp-chevron" aria-hidden="true"></span>Torna alla voce';
+      pillola.setAttribute('aria-label', 'Torna alla voce da cui sei partito');
+      pillola.innerHTML = '<span class="bp-chevron" aria-hidden="true"></span>';
       document.body.appendChild(pillola);
     }
     pillola.onclick = () => {
