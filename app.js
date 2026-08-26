@@ -399,23 +399,44 @@
     void target.offsetWidth;
     target.classList.add('fonte-flash');
     setTimeout(() => target.classList.remove('fonte-flash'), 2000);
-    // Backlink alla Wikipedia: un solo tastino alla volta, resta finché non lo usi
-    document.querySelectorAll('.fn-back').forEach((b) => b.remove());
-    const origine = a.closest('.v-row') || a.closest('summary') || a.parentElement;
-    const back = document.createElement('button');
-    back.className = 'fn-back';
-    back.textContent = '↩ torna dov\'eri';
-    back.addEventListener('click', (ev) => {
-      ev.stopPropagation();
+    mostraPillolaRitorno(a.closest('.v-row') || a.closest('summary') || a.parentElement);
+  });
+
+  /* Pillola flottante "Torna alla voce" (pattern snackbar alla TikTok/YouTube):
+     sale dal basso dopo il salto a una fonte, ti riporta al punto di partenza
+     evidenziandolo, e si congeda da sola se ci risali per conto tuo. */
+  let pillola = null;
+  let pillolaObs = null;
+  function nascondiPillola() {
+    if (pillola) pillola.classList.remove('is-visible');
+    if (pillolaObs) { pillolaObs.disconnect(); pillolaObs = null; }
+  }
+  function mostraPillolaRitorno(origine) {
+    if (!origine) return;
+    if (!pillola) {
+      pillola = document.createElement('button');
+      pillola.className = 'back-pill';
+      pillola.innerHTML = '<span class="bp-chevron" aria-hidden="true"></span>Torna alla voce';
+      document.body.appendChild(pillola);
+    }
+    pillola.onclick = () => {
       let d = origine.closest('details');
       while (d) { d.open = true; d = d.parentElement && d.parentElement.closest('details'); }
       origine.scrollIntoView({ block: 'center', behavior: 'smooth' });
       origine.classList.add('fonte-flash');
       setTimeout(() => origine.classList.remove('fonte-flash'), 2000);
-      back.remove();
-    });
-    target.appendChild(back);
-  });
+      nascondiPillola();
+    };
+    requestAnimationFrame(() => pillola.classList.add('is-visible'));
+    // Se l'utente risale da solo fino alla voce di partenza, la pillola non serve più
+    if (pillolaObs) pillolaObs.disconnect();
+    setTimeout(() => {
+      pillolaObs = new IntersectionObserver((voci) => {
+        if (voci[0].isIntersecting) nascondiPillola();
+      });
+      pillolaObs.observe(origine);
+    }, 1200);
+  }
 
   function renderResult(r) {
     const d = r.mensilitaDetail;

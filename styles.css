@@ -487,14 +487,25 @@ details.b-details th { color: var(--ink-muted); font-weight: 600; }
 
 .fonti li.fonte-flash { animation: fonte-flash 2s ease; border-radius: 6px; }
 .fonte-flash { animation: fonte-flash 2s ease; }
-.fn-back {
-  background: none; border: none; font: inherit; cursor: pointer;
-  color: var(--green-deep); font-size: 0.85rem; font-weight: 600;
-  text-decoration: underline; text-underline-offset: 3px;
-  margin-left: 8px; padding: 12px 8px; margin-top: -12px; margin-bottom: -12px; /* bersaglio 44px senza spostare il testo */
+.back-pill {
+  position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%) translateY(90px); opacity: 0;
+  transition: transform 220ms ease, opacity 220ms ease;
+  z-index: 60; pointer-events: none;
+  display: inline-flex; align-items: center; gap: 9px;
+  background: var(--lime); color: var(--ink);
+  border: 1.5px solid var(--ink); border-radius: 999px;
+  padding: 12px 22px; font-family: var(--font-display); font-weight: 700; font-size: 0.95rem;
+  box-shadow: 0 6px 24px rgba(17, 21, 10, 0.22);
+  cursor: pointer;
 }
-.fn-back:hover { color: var(--ink); }
-.fn-back:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; border-radius: 4px; }
+.back-pill.is-visible { transform: translateX(-50%) translateY(0); opacity: 1; pointer-events: auto; }
+.back-pill .bp-chevron {
+  width: 8px; height: 8px; margin-top: 3px;
+  border-left: 2.5px solid var(--ink); border-top: 2.5px solid var(--ink);
+  transform: rotate(45deg);
+}
+.back-pill:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 @keyframes fonte-flash {
   0%, 55% { background: var(--lime-soft); box-shadow: 0 0 0 6px var(--lime-soft); }
   100% { background: transparent; box-shadow: none; }
