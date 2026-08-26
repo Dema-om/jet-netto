@@ -152,8 +152,8 @@ payroll, dove la compliance è il mestiere. Il flusso di produzione sarebbe:
   sull'anno successivo).
 - Regioni diverse dalla Lombardia: aliquota base pubblicata (alcune regioni
   hanno scaglioni propri; la struttura dati li supporta già, vedi Lombardia).
-- Comuni: aliquote, scaglioni e soglie di esenzione REALI per tutti i 7.904
-  comuni, importate dall'elenco annuale ufficiale dell'Agenzia delle Entrate
+- Comuni: aliquote, scaglioni e soglie di esenzione REALI per 7.871 dei
+  7.904 comuni, importate dall'elenco annuale ufficiale dell'Agenzia delle Entrate
   (modulistica 2026, riferito a saldo 2025 / acconto 2026) e unite all'elenco
   ISTAT tramite codice catastale. 1.095 comuni con scaglioni propri sono
   calcolati per scaglioni; 33 comuni di recente istituzione non presenti
@@ -222,11 +222,16 @@ Le scelte minute d'interfaccia sono ragionate quanto quelle fiscali:
   campi in colonna dove le etichette andrebbero a capo. I bersagli tattili
   seguono, oltre agli standard WCAG, le Apple Human Interface Guidelines:
   44px effettivi anche dove il disegno è più piccolo (pallini, logo, chip),
-  estendendo l'area toccabile senza toccare l'estetica.
+  estendendo l'area toccabile senza toccare l'estetica. E il telefono è
+  trattato da telefono: feedback al tocco disegnati dal sito (niente flash
+  grigio di sistema) e tastiera che non si impone: non si apre da sola e si
+  chiude scegliendo un importo preimpostato.
 - **Trovabilità curata (SEO e GEO)**: titolo brand-first ("Jet Netto |
   dalla RAL al netto 2026"), Open Graph per le anteprime nelle chat e sui
   social, canonical e scheda JSON-LD (WebApplication): la SEO parla ai
   motori di ricerca, la GEO agli assistenti AI che citano gli strumenti.
+  Il robots.txt con la sitemap dà il benvenuto esplicito a entrambi i
+  tipi di crawler.
 - **Anche la favicon è nel sistema**: il marchio nella tab è una variante
   del logo Jet HR nell'accento del sito (J lime su nero caldo), per
   distinguere a colpo d'occhio il prototipo dal sito principale. In due
@@ -246,6 +251,8 @@ engine.js       motore fiscale puro (browser + Node)
 engine.test.js  test: node engine.test.js
 comuni.js       7.904 comuni ISTAT con i dati dell'elenco AdE
 italy-map.js    geometrie SVG delle regioni (@svg-maps/italy, MIT)
+favicon.png     variante lime del marchio (con apple-touch-icon.png)
+robots.txt      benvenuto esplicito a crawler e assistenti AI (+ sitemap.xml)
 ```
 
 Il design usa i token reali di Jet HR (nero caldo `#11150a`, lime `#dfeb57`,

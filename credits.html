@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sviluppato da Matteo De Marco | Jet Netto</title>
-  <meta name="description" content="Metodo, fonti e scelte di design dietro jet netto, il calcolatore RAL → netto 2026: motore testato, dati ufficiali per 7.877 comuni, accessibilità curata.">
+  <meta name="description" content="Metodo, fonti e scelte di design dietro jet netto, il calcolatore RAL → netto 2026: motore testato, dati ufficiali per 7.871 comuni, accessibilità curata.">
   <link rel="canonical" href="https://jetnetto.zetakiwi.com/credits.html">
   <link rel="icon" type="image/png" href="favicon.png?v=2">
   <link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
@@ -33,7 +33,7 @@
       </div>
       <div class="city-row">
         <span class="city-label">In numeri</span>
-        <span class="city-value">53 test, 7.877 comuni con dati ufficiali, 11 fonti verificate</span>
+        <span class="city-value">53 test, 7.871 comuni con dati ufficiali, 11 fonti verificate</span>
       </div>
     </div>
 
@@ -60,15 +60,15 @@
         <li><b>La ricerca comune si svuota al focus</b> → toccando il campo, il capoluogo proposto si toglie da solo e i suggerimenti si aprono subito: scrivere sopra un valore precompilato è attrito inutile.</li>
         <li><b>Il bordo intero della regione</b> → in SVG i confini condivisi vengono coperti dalle regioni disegnate dopo: la selezionata viene portata in cima allo stack, così il suo contorno resta integro. E uscendo dalla mappa, il riquadro torna alla regione scelta, non all'ultima sfiorata.</li>
         <li><b>Il contratto si chiede solo a chi serve</b> → indeterminato/determinato appare solo nel flusso azienda, allo step dell'offerta: sul netto del dipendente non cambia nulla, e un campo che non cambia nulla è rumore.</li>
-        <li><b>Mobile first sul serio</b> → un calcolatore di stipendi si usa sul divano, non alla scrivania: layout verificato a 375px senza scroll orizzontale, avanzamento ridotto ai soli pallini sugli schermi stretti, campi in colonna dove le etichette andrebbero a capo. E i bersagli tattili seguono, oltre agli standard WCAG, le Apple Human Interface Guidelines: 44px effettivi anche dove il disegno è più piccolo, allargando l'area toccabile senza toccare l'estetica.</li>
-        <li><b>Trovabilità curata (SEO + GEO)</b> → titolo pensato per la tab del browser, anteprime social pronte (Open Graph) e scheda strutturata JSON-LD: la SEO parla ai motori di ricerca, la GEO agli assistenti AI. Il sito si presenta bene anche fuori dalla pagina.</li>
+        <li><b>Mobile first sul serio</b> → un calcolatore di stipendi si usa sul divano, non alla scrivania: layout verificato a 375px senza scroll orizzontale, avanzamento ridotto ai soli pallini sugli schermi stretti, campi in colonna dove le etichette andrebbero a capo. E i bersagli tattili seguono, oltre agli standard WCAG, le Apple Human Interface Guidelines: 44px effettivi anche dove il disegno è più piccolo, allargando l'area toccabile senza toccare l'estetica. Il telefono poi è trattato da telefono: feedback al tocco disegnati dal sito e tastiera che non si impone mai.</li>
+        <li><b>Trovabilità curata (SEO + GEO)</b> → titolo pensato per la tab del browser, anteprime social pronte (Open Graph) e scheda strutturata JSON-LD: la SEO parla ai motori di ricerca, la GEO agli assistenti AI, e il robots.txt con la sitemap dà il benvenuto esplicito a entrambi. Il sito si presenta bene anche fuori dalla pagina.</li>
         <li><b>Anche la favicon è nel sistema</b> → il marchio nella tab è una variante del logo Jet HR nell'accento del sito, J lime su nero caldo: distingue il prototipo dal sito principale a colpo d'occhio, e il brand resta coerente fino all'icona.</li>
       </ul>
 
       <h3>Cosa c'è dentro</h3>
       <ul>
         <li><b>Due viste, un motore</b> → dipendente (netto, cascata delle trattenute, calendario delle mensilità con la tredicesima "più leggera" spiegata) e azienda (costo totale, contributo addizionale del tempo determinato, simulatore degli incentivi strutturali).</li>
-        <li><b>Dati veri, non tipici</b> → 20 regioni dalla mappa interattiva; 7.877 comuni con aliquota, soglia di esenzione e scaglioni importati dall'elenco annuale ufficiale dell'Agenzia delle Entrate, uniti all'elenco ISTAT per codice catastale; 1.095 comuni calcolati per scaglioni veri; 33 comuni recenti con fallback dichiarato in interfaccia.</li>
+        <li><b>Dati veri, non tipici</b> → 20 regioni dalla mappa interattiva; 7.871 comuni con aliquota, soglia di esenzione e scaglioni importati dall'elenco annuale ufficiale dell'Agenzia delle Entrate, uniti all'elenco ISTAT per codice catastale; 1.095 comuni calcolati per scaglioni veri; 33 comuni recenti con fallback dichiarato in interfaccia.</li>
         <li><b>Le logiche nel prodotto</b> → ogni voce del risultato si apre sulla propria spiegazione: prima le parole, poi la formula coi numeri dell'utente, poi gli scaglioni. E ogni termine tecnico (addizionale, esenzione, TFR) ha la spiegazione al passaggio.</li>
         <li><b>Report stampabili</b> → un PDF per il dipendente e uno per l'azienda, generati dal browser senza che alcun dato lasci la pagina. Deep link per condividere una simulazione con un URL.</li>
       </ul>
