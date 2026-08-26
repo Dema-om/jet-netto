@@ -166,6 +166,9 @@ body {
 .linklike:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; border-radius: 4px; }
 .city-edit { margin-top: 16px; display: none; gap: 14px; }
 .city-edit.is-open { display: grid; grid-template-columns: 1fr 1fr; }
+@media (max-width: 560px) { .city-edit.is-open { grid-template-columns: 1fr; } }
+.city-edit .field { display: flex; flex-direction: column; }
+.city-edit .field input { margin-top: auto; }
 .city-edit .field label { display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 5px; color: var(--ink-soft); }
 .city-edit .field input {
   width: 100%; padding: 10px 12px; font: inherit; border: 1.5px solid var(--border-strong);
