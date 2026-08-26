@@ -166,6 +166,12 @@ payroll, dove la compliance è il mestiere. Il flusso di produzione sarebbe:
 - Massimale contributivo post-1996 ignorato; trattamento integrativo
   semplificato alla sola detrazione lavoro.
 - Nessun contributo di categoria oltre l'INPS (es. fondi CCNL).
+- Solo RAL monetaria: welfare, buoni pasto, fringe benefit e premi di
+  risultato restano fuori dal calcolo. Viaggiano sopra la RAL e, entro le
+  soglie di legge, sono esenti: si sommano al percepito senza passare dalle
+  tasse. Due offerte con la stessa RAL possono quindi valere diversamente;
+  il confronto qui riguarda solo la parte monetaria. Non li modelliamo
+  perché le soglie di esenzione cambiano di manovra in manovra.
 
 ## Fonti
 
