@@ -271,7 +271,7 @@ function addizionaleRegionale(imponibile, regione) {
     const totale = imponibile * fascia.aliquota;
     return {
       totale,
-      dettaglio: totale > 0 ? [{ da: 0, a: imponibile, aliquota: fascia.aliquota, importo: totale }] : null,
+      dettaglio: totale > 0 ? [{ da: 0, a: imponibile, aliquota: fascia.aliquota, quota: imponibile, imposta: totale }] : null,
       regola: totale > 0 ? 'per fasce, sull\'intero imponibile' : 'esente sotto soglia',
       detrazione: 0,
     };
@@ -280,7 +280,7 @@ function addizionaleRegionale(imponibile, regione) {
     const totale = imponibile * regione.flatFino.aliquota;
     return {
       totale,
-      dettaglio: [{ da: 0, a: imponibile, aliquota: regione.flatFino.aliquota, importo: totale }],
+      dettaglio: [{ da: 0, a: imponibile, aliquota: regione.flatFino.aliquota, quota: imponibile, imposta: totale }],
       regola: 'aliquota ridotta sotto soglia',
       detrazione: 0,
     };

@@ -79,7 +79,7 @@
       p.setAttribute('tabindex', '0');
       p.setAttribute('aria-selected', 'false');
       const reg = TAX_2026.regioni[loc.id];
-      const aliq = reg.scaglioni ? 'a scaglioni, 1,23% – 1,73%' : fmtPct(reg.aliquota).replace(',00%', '%');
+      const aliq = etichettaRegione(reg).replace(/<[^>]+>/g, '');
       p.setAttribute('aria-label', `${reg.nome}, addizionale regionale ${aliq}`);
       p.addEventListener('click', () => selectRegion(loc.id));
       p.addEventListener('keydown', (e) => {
@@ -94,14 +94,34 @@
     $('#map-slot').appendChild(svg);
   }
 
+  // Etichetta sintetica dell'addizionale regionale, costruita dalla
+  // struttura vera (aliquota unica, scaglioni, fasce, ridotta sotto soglia)
+  function etichettaRegione(reg) {
+    const compatta = (x) => fmtPct(x).replace(',00%', '%');
+    if (reg.fasceIntero) {
+      const prima = reg.fasceIntero[0];
+      const ultima = reg.fasceIntero[reg.fasceIntero.length - 1];
+      return prima.aliquota === 0
+        ? `esente fino a ${fmtEur(prima.fino)}, poi ${compatta(ultima.aliquota)} su tutto`
+        : `${compatta(prima.aliquota)} – ${compatta(ultima.aliquota)} per fasce, sull'intero imponibile`;
+    }
+    if (reg.flatFino) {
+      const max = reg.scaglioni[reg.scaglioni.length - 1].aliquota;
+      return `${compatta(reg.flatFino.aliquota)} fino a ${fmtEur(reg.flatFino.soglia)}, poi a scaglioni fino al ${compatta(max)}`;
+    }
+    if (reg.scaglioni) {
+      const aliquote = reg.scaglioni.map((s) => s.aliquota);
+      return `a scaglioni: ${compatta(Math.min(...aliquote))} – ${compatta(Math.max(...aliquote))}`;
+    }
+    return compatta(reg.aliquota);
+  }
+
   const TIP_ADDIZIONALE = 'Una piccola percentuale del tuo reddito che va alla regione, in aggiunta all\'IRPEF nazionale. La decide ogni regione.';
 
   function showHint(id) {
     const reg = TAX_2026.regioni[id];
     const term = `<span class="tip" tabindex="0" data-tip="${TIP_ADDIZIONALE}">addizionale regionale</span>`;
-    const aliq = reg.scaglioni
-      ? `${term} a scaglioni: 1,23% – 1,73%`
-      : `${term}: ${fmtPct(reg.aliquota)}`;
+    const aliq = `${term}: ${etichettaRegione(reg)}`;
     $('#geo-hint').innerHTML = `<strong>${reg.nome}</strong>${aliq}`;
   }
 
