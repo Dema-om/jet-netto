@@ -183,6 +183,13 @@ payroll, dove la compliance è il mestiere. Il flusso di produzione sarebbe:
   14.000 €).
 - Incentivi all'assunzione: L. 92/2012 (art. 4 e art. 2 c. 10-bis).
 
+## I dettagli di UX
+
+Le scelte minute di interfaccia (fonti che scorrono ed evidenziano, soglie
+tradotte in RAL, copy che cambia soggetto, la grammatica dei colori) sono
+raccontate una per una, con le motivazioni, nella pagina
+[credits](https://jetnetto.zetakiwi.com/credits.html) del sito.
+
 ## Struttura
 
 ```
