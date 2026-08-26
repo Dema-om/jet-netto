@@ -122,6 +122,7 @@ body {
   content: attr(data-tip);
   position: absolute; left: 0; bottom: calc(100% + 8px);
   width: 230px; padding: 10px 12px;
+  white-space: normal; /* il genitore può avere nowrap (etichette): il tooltip va sempre a capo */
   background: var(--ink); color: #fff;
   font-size: 0.8rem; line-height: 1.45; font-weight: 400;
   border-radius: 10px; box-shadow: var(--shadow);
