@@ -324,8 +324,8 @@ details.bd-acc > summary.bd-head:hover { background: var(--paper-soft); }
 details.bd-acc > summary.bd-head:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; }
 details.bd-acc[open] > summary.bd-head { border-bottom: 1px solid var(--border); }
 .bd-chevron {
-  width: 9px; height: 9px; flex: none; margin-right: 20px;
-  border-right: 2px solid var(--ink-muted); border-bottom: 2px solid var(--ink-muted);
+  width: 12px; height: 12px; flex: none; margin-right: 20px;
+  border-right: 2.5px solid var(--ink); border-bottom: 2.5px solid var(--ink);
   transform: rotate(45deg); transition: transform 150ms;
 }
 details.bd-acc[open] .bd-chevron { transform: rotate(225deg); }
@@ -345,6 +345,10 @@ sup.fn { font-size: 0.62em; margin-left: 2px; }
 sup.fn a {
   color: var(--green-deep); font-weight: 700; cursor: pointer;
   text-decoration: underline dotted; text-underline-offset: 2px;
+  /* bersaglio tattile esteso: il padding allarga l'area, il margine negativo
+     lo compensa e il testo non si sposta di un pixel */
+  padding: 14px 8px; margin: -14px -8px;
+  position: relative; z-index: 1;
 }
 sup.fn a:hover { color: var(--ink); }
 sup.fn a:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px; border-radius: 3px; }
@@ -378,7 +382,7 @@ details.v-row > summary::-webkit-details-marker { display: none; }
 .v-row.is-minus .b-bar i { background: #e8b9b9; }
 details.v-row.has-body .v-name::before {
   content: "\25B8"; display: inline-block; margin-right: 7px;
-  color: var(--green-deep); font-size: 0.8em;
+  color: var(--green-deep); font-size: 0.95em;
   transition: transform 150ms;
 }
 details.v-row[open] .v-name::before { transform: rotate(90deg); }

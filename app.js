@@ -299,7 +299,8 @@
         state.ral = Number(c.dataset.ral);
         chips.forEach((x) => x.classList.toggle('is-active', x === c));
         validateRal(true);
-        input.focus();
+        // Su touch il chip chiude la tastiera; su desktop lascia il campo pronto
+        if (TOUCH) input.blur(); else input.focus();
       });
     });
 
