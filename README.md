@@ -227,9 +227,10 @@ Le scelte minute d'interfaccia sono ragionate quanto quelle fiscali:
   dalla RAL al netto 2026"), Open Graph per le anteprime nelle chat e sui
   social, canonical e scheda JSON-LD (WebApplication): la SEO parla ai
   motori di ricerca, la GEO agli assistenti AI che citano gli strumenti.
-- **Anche la favicon è nel sistema**: il marchio nella tab è il logo Jet HR
-  ricolorato pixel per pixel nell'accento del sito (J lime su nero caldo),
-  in due misure (tab e touch icon iPhone).
+- **Anche la favicon è nel sistema**: il marchio nella tab è una variante
+  del logo Jet HR nell'accento del sito (J lime su nero caldo), per
+  distinguere a colpo d'occhio il prototipo dal sito principale. In due
+  misure: tab e touch icon iPhone.
 
 Le stesse scelte, con più contesto, sono nella pagina
 [credits](https://jetnetto.zetakiwi.com/credits.html) del sito.
