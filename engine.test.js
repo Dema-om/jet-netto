@@ -157,6 +157,18 @@ console.log('— Vista azienda: costo e sgravi (L. 92/2012)');
   ok(calcolaSgravio('inventato', 30000) === null, 'sgravio sconosciuto rifiutato');
 }
 
+console.log('— Condizione di debenza delle addizionali (no-tax area)');
+{
+  // A RAL bassa l'IRPEF netta è 0: le addizionali NON sono dovute (art. 50 D.Lgs. 446/1997)
+  const basso = calcolaNetto({ ral: 8000, regioneId: 'lombardy', comuneAliquota: 0.008, comuneEsenzione: 23000 });
+  ok(basso.irpef.netta === 0, 'RAL 8.000: IRPEF netta azzerata');
+  ok(basso.addizionali.regionale === 0, 'IRPEF a zero → nessuna addizionale regionale dovuta');
+  ok(basso.addizionali.comunale === 0, 'IRPEF a zero → nessuna addizionale comunale dovuta');
+  // Sopra la no-tax area invece si pagano
+  const medio = calcolaNetto({ ral: 30000, regioneId: 'lombardy', comuneAliquota: 0.008, comuneEsenzione: 23000 });
+  ok(medio.addizionali.regionale > 0, 'RAL 30.000: addizionale regionale dovuta');
+}
+
 console.log('— Robustezza input');
 {
   let thrown = false;

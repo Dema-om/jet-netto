@@ -151,8 +151,12 @@ payroll, dove la compliance è il mestiere. Il flusso di produzione sarebbe:
   mansioni d'ufficio, nessun fondo di categoria da CCNL.
 - Addizionali per competenza sull'anno (in busta reale: saldo e acconto
   sull'anno successivo).
-- Regioni diverse dalla Lombardia: aliquota base pubblicata (alcune regioni
-  hanno scaglioni propri; la struttura dati li supporta già, vedi Lombardia).
+- Addizionale regionale: Lombardia, Friuli-Venezia Giulia e Lazio a scaglioni
+  progressivi reali 2026; le altre ad aliquota base pubblicata. Le deduzioni/
+  franchigie di Trento e Bolzano non sono modellate (dato non verificato in
+  modo univoco: dichiarato invece che stimato).
+- Le addizionali seguono la condizione di debenza: sotto la no-tax area, dove
+  l'IRPEF si azzera, non sono dovute (art. 50 D.Lgs. 446/1997).
 - Comuni: aliquote, scaglioni e soglie di esenzione REALI per 7.871 dei
   7.904 comuni, importate dall'elenco annuale ufficiale dell'Agenzia delle Entrate
   (modulistica 2026, riferito a saldo 2025 / acconto 2026) e unite all'elenco

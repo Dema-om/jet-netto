@@ -96,8 +96,24 @@ const TAX_2026 = {
     calabria:                { nome: 'Calabria',               aliquota: 0.0203, capoluogo: 'Catanzaro' },
     campania:                { nome: 'Campania',               aliquota: 0.0203, capoluogo: 'Napoli' },
     'emilia-romagna':        { nome: 'Emilia-Romagna',         aliquota: 0.0133, capoluogo: 'Bologna' },
-    'friuli-venezia-giulia': { nome: 'Friuli-Venezia Giulia',  aliquota: 0.0070, capoluogo: 'Trieste' },
-    lazio:                   { nome: 'Lazio',                  aliquota: 0.0173, capoluogo: 'Roma' },
+    'friuli-venezia-giulia': {
+      nome: 'Friuli-Venezia Giulia', capoluogo: 'Trieste',
+      // Agevolazione redditi bassi 2026: 0,70% fino a 15.000, 1,23% oltre
+      scaglioni: [
+        { fino: 15000, aliquota: 0.0070 },
+        { fino: Infinity, aliquota: 0.0123 },
+      ],
+    },
+    lazio: {
+      nome: 'Lazio', capoluogo: 'Roma',
+      // Tra le più alte d'Italia 2026: 1,73% / 2,73% / 2,93% / 3,33%
+      scaglioni: [
+        { fino: 15000, aliquota: 0.0173 },
+        { fino: 28000, aliquota: 0.0273 },
+        { fino: 50000, aliquota: 0.0293 },
+        { fino: Infinity, aliquota: 0.0333 },
+      ],
+    },
     liguria:                 { nome: 'Liguria',                aliquota: 0.0123, capoluogo: 'Genova' },
     lombardy: {
       nome: 'Lombardia', capoluogo: 'Milano',
@@ -186,16 +202,23 @@ function calcolaNetto(p) {
   // L'IRPEF netta non scende sotto zero: l'eccedenza si perde (incapienza)
   const irpefNetta = Math.max(0, irpefLorda - detrazioneLavoro - ulterioreDetrazione);
 
-  // 5. Addizionali (stessa base imponibile IRPEF; semplificazione: competenza)
-  const addRegionaleCalc = regione.scaglioni
-    ? perScaglioni(imponibile, regione.scaglioni)
-    : { totale: imponibile * regione.aliquota, dettaglio: null };
+  // 5. Addizionali (stessa base imponibile IRPEF; semplificazione: competenza).
+  // Condizione di debenza: le addizionali sono dovute solo se l'IRPEF è dovuta,
+  // cioè se l'imposta netta è maggiore di zero (art. 50 c.2 D.Lgs. 446/1997 per
+  // la regionale, art. 1 c.4 D.Lgs. 360/1998 per la comunale). Sotto la no-tax
+  // area, dove l'IRPEF si azzera, non si pagano nemmeno le addizionali.
+  const irpefDovuta = irpefNetta > 0;
+  const addRegionaleCalc = !irpefDovuta
+    ? { totale: 0, dettaglio: null }
+    : (regione.scaglioni
+        ? perScaglioni(imponibile, regione.scaglioni)
+        : { totale: imponibile * regione.aliquota, dettaglio: null });
   const addRegionale = addRegionaleCalc.totale;
 
   const comAliquota = p.comuneAliquota ?? T.comuneDefault.aliquota;
   const comEsenzione = p.comuneEsenzione ?? T.comuneDefault.esenzione;
   // Alcuni comuni (elenco AdE) applicano scaglioni propri invece dell'aliquota unica
-  const comCalc = imponibile <= comEsenzione
+  const comCalc = (!irpefDovuta || imponibile <= comEsenzione)
     ? { totale: 0, dettaglio: null }
     : (p.comuneScaglioni && p.comuneScaglioni.length
         ? perScaglioni(imponibile, p.comuneScaglioni)
