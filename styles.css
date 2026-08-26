@@ -531,6 +531,8 @@ footer.colophon {
 }
 footer.colophon .credit { color: var(--ink-muted); text-decoration: underline; text-underline-offset: 3px; white-space: nowrap; }
 footer.colophon .credit:hover { color: var(--ink); }
+footer.colophon mark { background: linear-gradient(transparent 62%, var(--lime) 62%); padding: 0 2px; color: inherit; }
+footer.colophon .name-link { white-space: nowrap; padding: 12px 4px; margin: -12px -4px; /* bersaglio tattile senza spostare il testo */ }
 
 /* ─── Report stampabile ─── */
 .report-sheet { display: none; }
