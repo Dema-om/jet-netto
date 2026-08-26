@@ -29,7 +29,8 @@ controllo delle logiche. Il prototipo lo prende alla lettera su quattro piani:
    regione determina l'addizionale regionale (dati 2026 per tutte le 20
    regioni, Lombardia con i suoi scaglioni progressivi). Il comune si cerca
    con suggerimenti tra i soli comuni della regione scelta (elenco ISTAT,
-   7.904 comuni), col capoluogo proposto e i dati ufficiali AdE di ognuno.
+   7.904 comuni), col capoluogo proposto e i dati ufficiali AdE (7.871
+   comuni; per i 33 di recente istituzione, un valore tipico dichiarato).
 4. **Ogni numero ha la sua fonte.** Le voci del risultato portano rimandi
    numerati a fonti esclusivamente istituzionali (Normattiva, Agenzia delle
    Entrate, INPS, MEF, Comune di Milano, Roma Capitale), linkate in
