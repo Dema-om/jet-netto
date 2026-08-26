@@ -185,9 +185,32 @@ payroll, dove la compliance è il mestiere. Il flusso di produzione sarebbe:
 
 ## I dettagli di UX
 
-Le scelte minute di interfaccia (fonti che scorrono ed evidenziano, soglie
-tradotte in RAL, copy che cambia soggetto, la grammatica dei colori) sono
-raccontate una per una, con le motivazioni, nella pagina
+Le scelte minute d'interfaccia sono ragionate quanto quelle fiscali:
+
+- **Fonti che non ti perdono**: il click sul numerino di una fonte apre la
+  sezione Fonti, scorre centrando la voce e la illumina un attimo; da lì un
+  altro click porta al documento ufficiale. Al passaggio, il tooltip anticipa
+  quale fonte è.
+- **La soglia parla in RAL**: l'esenzione comunale per legge vale
+  sull'imponibile, ma l'utente conosce la sua RAL, quindi gliela traduciamo
+  ("con una RAL fino a ~25.300 €").
+- **Il copy cambia soggetto**: al dipendente il sito dà del tu, all'HR parla
+  del candidato. Stessi input, due persone diverse davanti allo schermo.
+- **Prima il totale, poi le voci**: il risultato apre con la cifra delle
+  trattenute; ogni voce si espande su parole → formula coi numeri
+  dell'utente → scaglioni.
+- **Una grammatica di colore**: nero = selezionato, lime = azione da
+  compiere, in tutto il sito.
+- **La ricerca comune si svuota al focus** e suggerisce subito: scrivere
+  sopra un valore precompilato è attrito inutile.
+- **Il bordo intero della regione**: la selezionata sale in cima allo stack
+  SVG (i confini condivisi non la coprono) e, uscendo dalla mappa, il
+  riquadro torna alla regione scelta, non all'ultima sfiorata.
+- **Il contratto si chiede solo a chi serve**: indeterminato/determinato
+  esiste solo nel flusso azienda, perché sul netto del dipendente non cambia
+  nulla.
+
+Le stesse scelte, con più contesto, sono nella pagina
 [credits](https://jetnetto.zetakiwi.com/credits.html) del sito.
 
 ## Struttura

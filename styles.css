@@ -157,8 +157,16 @@ body {
 }
 .city-card .city-row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 8px 0; }
 .city-card .city-row + .city-row { border-top: 1px solid var(--border); }
-.city-card .city-label { color: var(--ink-muted); font-size: 0.9rem; }
-.city-card .city-value { font-family: var(--font-display); font-weight: 700; }
+.city-card .city-label { color: var(--ink-muted); font-size: 0.9rem; white-space: nowrap; }
+.city-card .city-value { font-family: var(--font-display); font-weight: 700; text-align: right; }
+
+/* Nome cliccabile nella pagina credits: si vede che e' un link */
+.name-link { color: inherit; text-decoration: none; cursor: pointer; }
+.name-link .name-arrow { font-size: 0.45em; color: var(--green-deep); vertical-align: super; margin-left: 4px; transition: transform 150ms; display: inline-block; }
+.name-link mark { transition: background 150ms; }
+.name-link:hover mark { background: var(--lime); }
+.name-link:hover .name-arrow { transform: translate(2px, -2px); }
+.name-link:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; border-radius: 6px; }
 .linklike {
   background: none; border: none; padding: 0; font: inherit; color: var(--green-deep);
   text-decoration: underline; text-underline-offset: 3px; cursor: pointer; font-size: 0.9rem;
